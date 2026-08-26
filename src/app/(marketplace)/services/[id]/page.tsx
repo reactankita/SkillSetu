@@ -16,6 +16,7 @@ import {
   Star,
   Users,
   Lock,
+  ExternalLink,
 } from 'lucide-react';
 import { useSkillSetuStore } from '@/lib/data/store';
 import { Avatar } from '@/components/ui/avatar';
@@ -179,24 +180,75 @@ export default function ServiceDetailPage() {
             </div>
           </div>
 
-          {/* Portfolio Samples Gallery */}
-          {service.portfolio_urls && service.portfolio_urls.length > 0 && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs space-y-4">
-              <h3 className="text-base font-bold text-slate-900">Work Samples & Portfolio</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {service.portfolio_urls.map((url, idx) => (
-                  <div key={idx} className="relative h-48 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-                    <Image
-                      src={url}
-                      alt={`Portfolio sample ${idx + 1}`}
-                      fill
-                      className="object-cover hover:scale-105 transition-transform duration-300"
-                    />
+          {/* Portfolio Samples Gallery & Connected Projects */}
+          {(() => {
+            const studentPortfolio = store.getPortfolioByStudentId(service.student_id);
+            const connectedProjects = studentPortfolio?.projects.filter(
+              (p) => p.connected_service_id === service.id || p.category.toLowerCase() === service.category.toLowerCase()
+            ) || [];
+            const usernameSlug = studentPortfolio?.username || service.student_name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+            return (
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900">Portfolio Examples & Deliverables</h3>
+                    <p className="text-xs text-slate-500">Real case studies and verified project results</p>
                   </div>
-                ))}
+                  {studentPortfolio?.status === 'published' && (
+                    <Link href={`/portfolio/${usernameSlug}`} target="_blank">
+                      <Button variant="outline" size="sm" className="font-bold text-xs">
+                        <ExternalLink className="w-3.5 h-3.5 mr-1 text-orange-600" />
+                        Full Portfolio
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+
+                {connectedProjects.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {connectedProjects.map((proj) => (
+                      <div
+                        key={proj.id}
+                        className="rounded-xl border border-slate-200 bg-slate-50/60 overflow-hidden flex flex-col justify-between"
+                      >
+                        <div className="relative h-40 w-full bg-slate-100">
+                          <Image
+                            src={proj.cover_image_url}
+                            alt={proj.title}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="p-4 space-y-1.5">
+                          <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{proj.title}</h4>
+                          <p className="text-[11px] text-slate-600 line-clamp-2">{proj.short_description}</p>
+                          {proj.project_outcome && (
+                            <p className="text-[10px] text-emerald-800 font-medium line-clamp-1">
+                              ✓ {proj.project_outcome}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {service.portfolio_urls.map((url, idx) => (
+                      <div key={idx} className="relative h-44 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+                        <Image
+                          src={url}
+                          alt={`Portfolio sample ${idx + 1}`}
+                          fill
+                          className="object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Verified Client Reviews */}
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs space-y-4">

@@ -16,7 +16,6 @@ import {
   Sparkles,
   ArrowRight,
   Lightbulb,
-  Briefcase,
 } from 'lucide-react';
 import { useSkillSetuStore } from '@/lib/data/store';
 import { MetricCard } from '@/components/dashboard/MetricCard';
@@ -70,7 +69,7 @@ export default function DashboardPage() {
 
   const clientTotalSpent = clientBookings
     .filter((b) => b.status !== 'CANCELLED')
-    .reduce((acc, b) => acc + b.total_amount, client.total_spent || 12450);
+    .reduce((acc, b) => acc + b.total_amount, client.total_spent);
 
   const clientProtectedPayments = clientBookings
     .filter((b) => b.payment_status === 'PROTECTED')
@@ -84,30 +83,74 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Welcome back, {student.full_name.split(' ')[0]}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Here is how your skills, portfolio views, and client bookings are performing this month.
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                Here is how your skills and client bookings are performing this month.
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <Link href="/portfolio">
-                <Button variant="outline" size="sm" className="font-bold text-xs">
-                  <Briefcase className="w-3.5 h-3.5 mr-1 text-orange-600" />
+              <Link href="/portfolio/builder">
+                <Button variant="outline" className="font-bold text-xs">
+                  <Sparkles className="w-3.5 h-3.5 mr-1 text-orange-600" />
                   Portfolio Builder
                 </Button>
               </Link>
-
               <Link href="/create">
-                <Button variant="default" size="sm" className="font-bold text-xs shadow-xs">
+                <Button variant="default" className="font-bold text-xs shadow-xs">
                   <PlusCircle className="w-4 h-4 mr-1.5" />
                   Create Service
                 </Button>
               </Link>
             </div>
           </div>
+
+          {/* Portfolio Builder Banner */}
+          {(() => {
+            const portfolio = store.getPortfolioByStudentId(student.id);
+            const isPub = portfolio?.status === 'published';
+            const slug = portfolio?.username || student.full_name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            return (
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2 py-0.5 rounded">
+                      Built-in Portfolio Builder
+                    </span>
+                    <Badge variant={isPub ? 'emerald' : 'secondary'} className="text-[10px] capitalize">
+                      {isPub ? 'Live & Published' : 'Draft / Not Created'}
+                    </Badge>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {isPub ? 'Your Professional Portfolio is Active' : 'Build Your Personal Portfolio on SkillSetu'}
+                  </h3>
+                  <p className="text-xs text-slate-500 max-w-xl leading-relaxed">
+                    {isPub
+                      ? `Clients can discover your projects, case studies, and verified outcomes directly at /portfolio/${slug}`
+                      : "Show clients what you can do — even if you don't have a personal portfolio website yet. Add projects, case studies, outcomes, and tools."}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {isPub && (
+                    <Link href={`/portfolio/${slug}`} target="_blank">
+                      <Button variant="outline" size="sm" className="text-xs font-bold">
+                        <ArrowRight className="w-3.5 h-3.5 mr-1" />
+                        View Live
+                      </Button>
+                    </Link>
+                  )}
+                  <Link href="/portfolio/builder">
+                    <Button variant="default" size="sm" className="font-bold text-xs shadow-xs">
+                      {isPub ? 'Edit Portfolio' : 'Create Portfolio →'}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Metric Cards Row */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -148,32 +191,32 @@ export default function DashboardPage() {
 
             <div className="space-y-6">
               {/* Growth Tips Card */}
-              <Card className="p-5 space-y-3.5 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+              <Card className="p-5 space-y-3.5">
+                <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
                   <Lightbulb className="w-4 h-4 text-orange-600" />
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Growth Tips</h3>
+                  <h3 className="text-sm font-bold text-slate-900">Growth Tips</h3>
                 </div>
 
-                <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
-                  <div className="p-2.5 rounded-lg bg-orange-50/60 dark:bg-orange-950/20 border border-orange-100/80 dark:border-orange-900/60 leading-relaxed">
-                    <strong className="text-orange-900 dark:text-orange-300 block font-semibold mb-0.5">Publish Portfolio Case Studies</strong>
-                    Profiles with 3+ project case studies receive 3.2x more client booking requests.
+                <div className="space-y-2.5 text-xs text-slate-600">
+                  <div className="p-2.5 rounded-lg bg-orange-50/60 border border-orange-100/80 leading-relaxed">
+                    <strong className="text-orange-900 block font-semibold mb-0.5">Add 2 More Portfolio Samples</strong>
+                    Profiles with 4+ portfolio images receive 3.2x more client booking requests.
                   </div>
-                  <div className="p-2.5 rounded-lg bg-teal-50/60 dark:bg-teal-950/20 border border-teal-100/80 dark:border-teal-900/60 leading-relaxed">
-                    <strong className="text-teal-900 dark:text-teal-300 block font-semibold mb-0.5">Enable Team Mode</strong>
+                  <div className="p-2.5 rounded-lg bg-teal-50/60 border border-teal-100/80 leading-relaxed">
+                    <strong className="text-teal-900 block font-semibold mb-0.5">Enable Team Mode</strong>
                     Unlock larger fest and event budgets by offering collaborative team services.
                   </div>
                 </div>
               </Card>
 
               {/* Earned Badges */}
-              <Card className="p-5 space-y-3 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Earned Badges</h3>
+              <Card className="p-5 space-y-3">
+                <h3 className="text-sm font-bold text-slate-900">Earned Badges</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {student.badges.map((b) => (
                     <span
                       key={b}
-                      className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                      className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200"
                     >
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                       <span>{b}</span>
@@ -185,11 +228,11 @@ export default function DashboardPage() {
           </div>
 
           {/* Recent Activity Table */}
-          <Card className="overflow-hidden border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <Card className="overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <CardTitle className="text-base text-slate-900 dark:text-slate-100">Recent Booking Activity</CardTitle>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Your incoming and active client orders</p>
+                <CardTitle className="text-base">Recent Booking Activity</CardTitle>
+                <p className="text-xs text-slate-500 mt-0.5">Your incoming and active client orders</p>
               </div>
               <Link
                 href="/bookings"
@@ -211,10 +254,10 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Client Workspace — {client.organization_name || client.full_name}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
                 Track your hired student talent, protected payments, and project deliverables.
               </p>
             </div>
@@ -261,11 +304,11 @@ export default function DashboardPage() {
           </div>
 
           {/* Active Bookings Action Table */}
-          <Card className="overflow-hidden border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <Card className="overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <CardTitle className="text-base text-slate-900 dark:text-slate-100">Active & Recent Hires</CardTitle>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Confirm completed work to release protected funds</p>
+                <CardTitle className="text-base">Active & Recent Hires</CardTitle>
+                <p className="text-xs text-slate-500 mt-0.5">Confirm completed work to release protected funds</p>
               </div>
               <Link href="/bookings" className="text-xs font-bold text-orange-600 hover:underline">
                 View All Bookings →
@@ -283,8 +326,8 @@ export default function DashboardPage() {
           <div className="space-y-4 pt-2">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Recommended Student Talent</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Top performers matching your previous hiring categories</p>
+                <h3 className="text-lg font-bold text-slate-900">Recommended Student Talent</h3>
+                <p className="text-xs text-slate-500">Top performers matching your previous hiring categories</p>
               </div>
               <Link href="/browse" className="text-xs font-bold text-orange-600 hover:underline">
                 Browse All →

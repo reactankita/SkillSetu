@@ -1,15 +1,6 @@
 import type { Metadata } from 'next';
-import { Manrope } from 'next/font/google';
 import './globals.css';
 import { SITE_CONFIG } from '@/config/site';
-import { ThemeProvider } from '@/components/theme/ThemeProvider';
-
-const manrope = Manrope({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-manrope',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: {
@@ -28,11 +19,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`h-full scroll-smooth ${manrope.variable}`} suppressHydrationWarning>
-      <body className="min-h-full flex flex-col font-sans bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-orange-100 selection:text-orange-900">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-        </ThemeProvider>
+    <html lang="en" className="h-full scroll-smooth">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased selection:bg-orange-100 selection:text-orange-900">
+        {children}
       </body>
     </html>
   );

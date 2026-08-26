@@ -17,7 +17,7 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-manrope)", "Manrope", "system-ui", "-apple-system", "sans-serif"],
+        sans: ["Manrope", "system-ui", "-apple-system", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

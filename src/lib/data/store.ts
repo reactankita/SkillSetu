@@ -12,14 +12,14 @@ import {
   NotificationItem,
   Dispute,
   StudentVerification,
-  ClientVerification,
   Portfolio,
   PortfolioProject,
+  PortfolioTheme,
+  PortfolioStatus,
   UserRole,
   BookingStatus,
   PaymentStatus,
   VerificationStatus,
-  ClientType,
 } from '@/types';
 import {
   SEED_STUDENTS,
@@ -43,7 +43,6 @@ const STORAGE_KEYS = {
   SERVICES: 'skillsetu_services',
   STUDENTS: 'skillsetu_students',
   CLIENTS: 'skillsetu_clients',
-  PORTFOLIOS: 'skillsetu_portfolios',
   BOOKINGS: 'skillsetu_bookings',
   REVIEWS: 'skillsetu_reviews',
   COMMUNITY_POSTS: 'skillsetu_community_posts',
@@ -51,6 +50,7 @@ const STORAGE_KEYS = {
   NOTIFICATIONS: 'skillsetu_notifications',
   DISPUTES: 'skillsetu_disputes',
   VERIFICATIONS: 'skillsetu_verifications',
+  PORTFOLIOS: 'skillsetu_portfolios',
 };
 
 // In-memory fallback
@@ -61,7 +61,6 @@ let memoryState = {
   services: [...SEED_SERVICES],
   students: [...SEED_STUDENTS],
   clients: [...SEED_CLIENTS],
-  portfolios: [...SEED_PORTFOLIOS],
   bookings: [...SEED_BOOKINGS],
   reviews: [...SEED_REVIEWS],
   communityPosts: [...SEED_COMMUNITY_POSTS],
@@ -69,6 +68,7 @@ let memoryState = {
   notifications: [...SEED_NOTIFICATIONS],
   disputes: [...SEED_DISPUTES],
   verifications: [...SEED_VERIFICATIONS],
+  portfolios: [...SEED_PORTFOLIOS],
 };
 
 // Event emitter for reactive updates across components
@@ -141,173 +141,6 @@ export const SkillSetuStore = {
     return this.getStudents().find((s) => s.id === id);
   },
 
-  getClientById(id: string): ClientProfile | undefined {
-    return this.getClients().find((c) => c.id === id);
-  },
-
-  // ----------------------------------------------------
-  // PORTFOLIO BUILDER ENGINE (Sections 8, 9, 10)
-  // ----------------------------------------------------
-  getPortfolios(): Portfolio[] {
-    return loadItem<Portfolio[]>(STORAGE_KEYS.PORTFOLIOS, memoryState.portfolios);
-  },
-
-  getPortfolioByStudentId(studentId: string): Portfolio | undefined {
-    const all = this.getPortfolios();
-    return all.find((p) => p.student_id === studentId);
-  },
-
-  savePortfolio(portfolioData: Partial<Portfolio> & { student_id: string }): Portfolio {
-    const all = this.getPortfolios();
-    const existingIndex = all.findIndex((p) => p.student_id === portfolioData.student_id);
-
-    const now = new Date().toISOString();
-    let saved: Portfolio;
-
-    if (existingIndex >= 0) {
-      saved = {
-        ...all[existingIndex],
-        ...portfolioData,
-        updated_at: now,
-      };
-      all[existingIndex] = saved;
-    } else {
-      saved = {
-        id: `portfolio-${Date.now()}`,
-        student_id: portfolioData.student_id,
-        headline: portfolioData.headline || 'Student Freelancer & Creator',
-        about: portfolioData.about || '',
-        skills: portfolioData.skills || [],
-        education: portfolioData.education || '',
-        experience: portfolioData.experience || '',
-        achievements: portfolioData.achievements || [],
-        certifications: portfolioData.certifications || [],
-        services_summary: portfolioData.services_summary || '',
-        template: portfolioData.template || 'professional',
-        status: portfolioData.status || 'draft',
-        projects: portfolioData.projects || [],
-        updated_at: now,
-      };
-      all.push(saved);
-    }
-
-    memoryState.portfolios = all;
-    saveItem(STORAGE_KEYS.PORTFOLIOS, all);
-    notifyListeners();
-    return saved;
-  },
-
-  publishPortfolio(studentId: string) {
-    const all = this.getPortfolios();
-    const existing = all.find((p) => p.student_id === studentId);
-    if (existing) {
-      existing.status = 'published';
-      existing.updated_at = new Date().toISOString();
-      memoryState.portfolios = [...all];
-      saveItem(STORAGE_KEYS.PORTFOLIOS, memoryState.portfolios);
-      notifyListeners();
-    }
-  },
-
-  unpublishPortfolio(studentId: string) {
-    const all = this.getPortfolios();
-    const existing = all.find((p) => p.student_id === studentId);
-    if (existing) {
-      existing.status = 'draft';
-      existing.updated_at = new Date().toISOString();
-      memoryState.portfolios = [...all];
-      saveItem(STORAGE_KEYS.PORTFOLIOS, memoryState.portfolios);
-      notifyListeners();
-    }
-  },
-
-  deletePortfolio(studentId: string) {
-    const all = this.getPortfolios().filter((p) => p.student_id !== studentId);
-    memoryState.portfolios = all;
-    saveItem(STORAGE_KEYS.PORTFOLIOS, all);
-    notifyListeners();
-  },
-
-  addProjectToPortfolio(studentId: string, project: Omit<PortfolioProject, 'id'>): PortfolioProject {
-    const portfolio = this.getPortfolioByStudentId(studentId) || this.savePortfolio({ student_id: studentId });
-    const newProject: PortfolioProject = {
-      ...project,
-      id: `proj-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    };
-
-    const updatedProjects = [newProject, ...(portfolio.projects || [])];
-    this.savePortfolio({
-      ...portfolio,
-      projects: updatedProjects,
-    });
-    return newProject;
-  },
-
-  deleteProjectFromPortfolio(studentId: string, projectId: string) {
-    const portfolio = this.getPortfolioByStudentId(studentId);
-    if (portfolio) {
-      const updatedProjects = portfolio.projects.filter((p) => p.id !== projectId);
-      this.savePortfolio({
-        ...portfolio,
-        projects: updatedProjects,
-      });
-    }
-  },
-
-  // ----------------------------------------------------
-  // CLIENT REGISTRATION & ONBOARDING (Section 5)
-  // ----------------------------------------------------
-  registerClient(clientData: Partial<ClientProfile> & { full_name: string; email: string }) {
-    const clients = this.getClients();
-    const newClientId = `client-${Date.now()}`;
-    const newSkillSetuId = clientData.skillsetu_id || `SK-CL-${Math.floor(100000 + Math.random() * 900000)}`;
-
-    const newClient: ClientProfile = {
-      id: newClientId,
-      email: clientData.email,
-      full_name: clientData.full_name,
-      avatar_url: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&auto=format&fit=crop&q=80`,
-      phone: clientData.phone || '+91 98200 00000',
-      role: 'client',
-      skillsetu_id: newSkillSetuId,
-      client_type: clientData.client_type || 'individual',
-      organization_name: clientData.organization_name,
-      organization_type: clientData.organization_type,
-      role_designation: clientData.role_designation,
-      website: clientData.website,
-      city: clientData.city || 'Mumbai',
-      location: clientData.city || 'Mumbai',
-      about: clientData.about || 'Client hiring verified student freelancers on SkillSetu.',
-      total_spent: 0,
-      hired_count: 0,
-      rating_given_avg: 5.0,
-      verification_status: clientData.verification_status || 'verified',
-      is_student_client: clientData.is_student_client || false,
-      created_at: new Date().toISOString(),
-    };
-
-    const updatedClients = [newClient, ...clients];
-    memoryState.clients = updatedClients;
-    memoryState.currentClientId = newClientId;
-    memoryState.userRole = 'client';
-
-    saveItem(STORAGE_KEYS.CLIENTS, updatedClients);
-    saveItem(STORAGE_KEYS.CURRENT_CLIENT_ID, newClientId);
-    saveItem(STORAGE_KEYS.CURRENT_USER_ROLE, 'client');
-
-    notifyListeners();
-    return newClient;
-  },
-
-  logout() {
-    memoryState.userRole = 'student';
-    saveItem(STORAGE_KEYS.CURRENT_USER_ROLE, 'student');
-    notifyListeners();
-  },
-
-  // ----------------------------------------------------
-  // SERVICES
-  // ----------------------------------------------------
   getServices(): Service[] {
     return loadItem<Service[]>(STORAGE_KEYS.SERVICES, memoryState.services);
   },
@@ -316,41 +149,38 @@ export const SkillSetuStore = {
     return this.getServices().find((s) => s.id === id);
   },
 
-  addService(service: Omit<Service, 'id' | 'created_at' | 'views_count' | 'bookings_count'>) {
-    const all = this.getServices();
-    const newService: Service = {
-      ...service,
+  addService(newService: Omit<Service, 'id' | 'created_at' | 'views_count' | 'bookings_count'>): Service {
+    const services = this.getServices();
+    const created: Service = {
+      ...newService,
       id: `service-${Date.now()}`,
-      created_at: new Date().toISOString(),
       views_count: 0,
       bookings_count: 0,
+      created_at: new Date().toISOString(),
     };
-    const updated = [newService, ...all];
+    const updated = [created, ...services];
     memoryState.services = updated;
     saveItem(STORAGE_KEYS.SERVICES, updated);
     notifyListeners();
-    return newService;
+    return created;
   },
 
-  updateService(id: string, updates: Partial<Service>) {
-    const all = this.getServices();
-    const updated = all.map((s) => (s.id === id ? { ...s, ...updates } : s));
+  updateService(id: string, patch: Partial<Service>) {
+    const services = this.getServices();
+    const updated = services.map((s) => (s.id === id ? { ...s, ...patch } : s));
     memoryState.services = updated;
     saveItem(STORAGE_KEYS.SERVICES, updated);
     notifyListeners();
   },
 
   deleteService(id: string) {
-    const all = this.getServices();
-    const updated = all.filter((s) => s.id !== id);
+    const services = this.getServices();
+    const updated = services.filter((s) => s.id !== id);
     memoryState.services = updated;
     saveItem(STORAGE_KEYS.SERVICES, updated);
     notifyListeners();
   },
 
-  // ----------------------------------------------------
-  // BOOKINGS & 10-STATE MACHINE
-  // ----------------------------------------------------
   getBookings(): Booking[] {
     return loadItem<Booking[]>(STORAGE_KEYS.BOOKINGS, memoryState.bookings);
   },
@@ -360,26 +190,23 @@ export const SkillSetuStore = {
   },
 
   createBooking(data: {
-    service_id: string;
-    booking_date: string;
-    time_slot: string;
-    duration_hours: number;
+    serviceId: string;
+    bookingDate: string;
+    timeSlot: string;
+    durationHours: number;
     message?: string;
   }): Booking {
-    const service = this.getServiceById(data.service_id);
+    const service = this.getServiceById(data.serviceId);
+    if (!service) throw new Error("Service not found");
+
     const client = this.getCurrentClient();
-
-    if (!service) throw new Error('Service not found');
-
-    const servicePrice = service.price * data.duration_hours;
+    const servicePrice = service.price * data.durationHours;
     const platformFee = Math.round(servicePrice * SITE_CONFIG.platformFeeRate);
     const totalAmount = servicePrice + platformFee;
 
-    const randomCode = Math.floor(10000 + Math.random() * 90000);
-
     const newBooking: Booking = {
       id: `booking-${Date.now()}`,
-      booking_code: `RAS-${randomCode}`,
+      booking_code: `RAS-${Math.floor(10000 + Math.random() * 90000)}`,
       service_id: service.id,
       service_title: service.title,
       service_category: service.category,
@@ -390,32 +217,29 @@ export const SkillSetuStore = {
       client_id: client.id,
       client_name: client.full_name,
       client_org: client.organization_name,
-      booking_date: data.booking_date,
-      time_slot: data.time_slot,
-      duration_hours: data.duration_hours,
+      booking_date: data.bookingDate,
+      time_slot: data.timeSlot,
+      duration_hours: data.durationHours,
       message: data.message,
       service_price: servicePrice,
       platform_fee: platformFee,
       total_amount: totalAmount,
-      status: 'ACTIVE',
+      status: 'CONFIRMED',
       payment_status: 'PROTECTED',
       created_at: new Date().toISOString(),
     };
 
-    const all = this.getBookings();
-    const updated = [newBooking, ...all];
+    const bookings = this.getBookings();
+    const updated = [newBooking, ...bookings];
     memoryState.bookings = updated;
     saveItem(STORAGE_KEYS.BOOKINGS, updated);
 
-    // Increment service bookings count
-    this.updateService(service.id, { bookings_count: service.bookings_count + 1 });
-
-    // Notify student of new booking
+    // Notify student
     this.addNotification({
       user_id: service.student_id,
       type: 'booking',
-      title: 'New Booking Confirmed & Protected',
-      message: `${client.full_name} booked "${service.title}" for ${data.booking_date}. Funds are safely protected.`,
+      title: 'New Booking Confirmed (Payment Protected)',
+      message: `${client.full_name} booked ${service.title} for ${data.bookingDate}. Payment of ₹${totalAmount} is secured.`,
       link_url: '/bookings',
     });
 
@@ -423,14 +247,14 @@ export const SkillSetuStore = {
     return newBooking;
   },
 
-  updateBookingStatus(bookingId: string, status: BookingStatus, paymentStatus?: PaymentStatus) {
-    const all = this.getBookings();
-    const updated = all.map((b) => {
-      if (b.id === bookingId) {
+  updateBookingStatus(id: string, status: BookingStatus, paymentStatus?: PaymentStatus) {
+    const bookings = this.getBookings();
+    const updated = bookings.map((b) => {
+      if (b.id === id) {
         return {
           ...b,
           status,
-          payment_status: paymentStatus || b.payment_status,
+          ...(paymentStatus ? { payment_status: paymentStatus } : {}),
           updated_at: new Date().toISOString(),
         };
       }
@@ -442,55 +266,42 @@ export const SkillSetuStore = {
     notifyListeners();
   },
 
-  // ----------------------------------------------------
-  // REVIEWS
-  // ----------------------------------------------------
   getReviews(): Review[] {
     return loadItem<Review[]>(STORAGE_KEYS.REVIEWS, memoryState.reviews);
   },
 
-  addReview(data: {
-    booking_id: string;
-    service_id: string;
-    student_id: string;
+  addReview(reviewData: {
+    bookingId: string;
     rating: number;
-    review_text: string;
-  }) {
-    const client = this.getCurrentClient();
-    const all = this.getReviews();
-
-    // Prevent duplicate reviews for same booking
-    if (all.some((r) => r.booking_id === data.booking_id)) {
-      return;
-    }
+    reviewText: string;
+  }): Review {
+    const booking = this.getBookingById(reviewData.bookingId);
+    if (!booking) throw new Error("Booking not found");
 
     const newReview: Review = {
       id: `review-${Date.now()}`,
-      booking_id: data.booking_id,
-      service_id: data.service_id,
-      student_id: data.student_id,
-      client_id: client.id,
-      client_name: client.full_name,
-      client_org: client.organization_name,
-      client_avatar: client.avatar_url,
-      rating: data.rating,
-      review_text: data.review_text,
+      booking_id: booking.id,
+      service_id: booking.service_id,
+      student_id: booking.student_id,
+      client_id: booking.client_id,
+      client_name: booking.client_name,
+      client_org: booking.client_org,
+      rating: reviewData.rating,
+      review_text: reviewData.reviewText,
       created_at: new Date().toISOString(),
     };
 
-    const updated = [newReview, ...all];
+    const reviews = this.getReviews();
+    const updated = [newReview, ...reviews];
     memoryState.reviews = updated;
     saveItem(STORAGE_KEYS.REVIEWS, updated);
 
-    // Update booking status to REVIEWED/CONFIRMED
-    this.updateBookingStatus(data.booking_id, 'CONFIRMED_BY_CLIENT', 'RELEASED');
-
     // Notify student
     this.addNotification({
-      user_id: data.student_id,
+      user_id: booking.student_id,
       type: 'review',
-      title: 'New Client Review Received',
-      message: `${client.full_name} left a ${data.rating}-star review on your completed service.`,
+      title: `${reviewData.rating}-Star Review Received!`,
+      message: `${booking.client_name} left a review for ${booking.service_title}.`,
       link_url: '/reviews',
     });
 
@@ -498,26 +309,29 @@ export const SkillSetuStore = {
     return newReview;
   },
 
-  // ----------------------------------------------------
-  // COMMUNITY
-  // ----------------------------------------------------
   getCommunityPosts(): CommunityPost[] {
     return loadItem<CommunityPost[]>(STORAGE_KEYS.COMMUNITY_POSTS, memoryState.communityPosts);
   },
 
-  addCommunityPost(post: Omit<CommunityPost, 'id' | 'created_at' | 'responses_count'>) {
-    const all = this.getCommunityPosts();
-    const newPost: CommunityPost = {
+  addCommunityPost(post: Omit<CommunityPost, 'id' | 'created_at' | 'responses_count' | 'client_id' | 'client_name' | 'client_org' | 'client_verified'>): CommunityPost {
+    const client = this.getCurrentClient();
+    const created: CommunityPost = {
       ...post,
       id: `post-${Date.now()}`,
+      client_id: client.id,
+      client_name: client.full_name,
+      client_org: client.organization_name,
+      client_verified: client.verification_status === 'verified',
       responses_count: 0,
       created_at: new Date().toISOString(),
     };
-    const updated = [newPost, ...all];
+
+    const posts = this.getCommunityPosts();
+    const updated = [created, ...posts];
     memoryState.communityPosts = updated;
     saveItem(STORAGE_KEYS.COMMUNITY_POSTS, updated);
     notifyListeners();
-    return newPost;
+    return created;
   },
 
   getCommunityResponses(postId?: string): CommunityResponse[] {
@@ -525,61 +339,52 @@ export const SkillSetuStore = {
     return postId ? all.filter((r) => r.post_id === postId) : all;
   },
 
-  addCommunityResponse(data: {
-    post_id: string;
-    proposal_text: string;
-    proposed_rate: number;
-  }) {
+  addCommunityResponse(postId: string, proposalText: string, proposedRate: number): CommunityResponse {
     const student = this.getCurrentStudent();
-    const all = this.getCommunityResponses();
-
-    const newResponse: CommunityResponse = {
-      id: `resp-${Date.now()}`,
-      post_id: data.post_id,
+    const created: CommunityResponse = {
+      id: `response-${Date.now()}`,
+      post_id: postId,
       student_id: student.id,
       student_name: student.full_name,
       student_avatar: student.avatar_url,
       student_college: student.college,
-      proposal_text: data.proposal_text,
-      proposed_rate: data.proposed_rate,
+      proposal_text: proposalText,
+      proposed_rate: proposedRate,
       status: 'applied',
       created_at: new Date().toISOString(),
     };
 
-    const updated = [newResponse, ...all];
+    const all = this.getCommunityResponses();
+    const updated = [created, ...all];
     memoryState.communityResponses = updated;
     saveItem(STORAGE_KEYS.COMMUNITY_RESPONSES, updated);
 
-    // Increment post response count
+    // Increment post responses count
     const posts = this.getCommunityPosts();
-    const updatedPosts = posts.map((p) => (p.id === data.post_id ? { ...p, responses_count: p.responses_count + 1 } : p));
+    const updatedPosts = posts.map((p) => (p.id === postId ? { ...p, responses_count: p.responses_count + 1 } : p));
     memoryState.communityPosts = updatedPosts;
     saveItem(STORAGE_KEYS.COMMUNITY_POSTS, updatedPosts);
 
     notifyListeners();
-    return newResponse;
+    return created;
   },
 
-  // ----------------------------------------------------
-  // NOTIFICATIONS
-  // ----------------------------------------------------
   getNotifications(): NotificationItem[] {
     return loadItem<NotificationItem[]>(STORAGE_KEYS.NOTIFICATIONS, memoryState.notifications);
   },
 
-  addNotification(item: Omit<NotificationItem, 'id' | 'created_at' | 'is_read'>) {
+  addNotification(notif: Omit<NotificationItem, 'id' | 'created_at' | 'is_read'>) {
     const all = this.getNotifications();
-    const newItem: NotificationItem = {
-      ...item,
+    const created: NotificationItem = {
+      ...notif,
       id: `notif-${Date.now()}`,
       is_read: false,
       created_at: new Date().toISOString(),
     };
-    const updated = [newItem, ...all];
+    const updated = [created, ...all];
     memoryState.notifications = updated;
     saveItem(STORAGE_KEYS.NOTIFICATIONS, updated);
     notifyListeners();
-    return newItem;
   },
 
   markNotificationAsRead(id: string) {
@@ -598,79 +403,72 @@ export const SkillSetuStore = {
     notifyListeners();
   },
 
-  // ----------------------------------------------------
-  // DISPUTES
-  // ----------------------------------------------------
   getDisputes(): Dispute[] {
     return loadItem<Dispute[]>(STORAGE_KEYS.DISPUTES, memoryState.disputes);
   },
 
-  raiseDispute(data: {
-    booking_id: string;
-    issue_type: string;
-    description: string;
-  }) {
-    const booking = this.getBookingById(data.booking_id);
-    const role = this.getUserRole();
-    const user = role === 'student' ? this.getCurrentStudent() : this.getCurrentClient();
+  raiseDispute(bookingId: string, issueType: string, description: string): Dispute {
+    const booking = this.getBookingById(bookingId);
+    if (!booking) throw new Error("Booking not found");
 
-    if (!booking) throw new Error('Booking not found');
+    const role = this.getUserRole();
+    const name = role === 'student' ? booking.student_name : booking.client_name;
+    const userId = role === 'student' ? booking.student_id : booking.client_id;
 
     const newDispute: Dispute = {
       id: `dispute-${Date.now()}`,
       booking_id: booking.id,
       booking_code: booking.booking_code,
-      raised_by_id: user.id,
-      raised_by_name: user.full_name,
+      raised_by_id: userId,
+      raised_by_name: name,
       raised_by_role: role,
-      issue_type: data.issue_type,
-      description: data.description,
+      issue_type: issueType,
+      description,
       status: 'reported',
       created_at: new Date().toISOString(),
     };
 
-    const all = this.getDisputes();
-    const updated = [newDispute, ...all];
+    const disputes = this.getDisputes();
+    const updated = [newDispute, ...disputes];
     memoryState.disputes = updated;
     saveItem(STORAGE_KEYS.DISPUTES, updated);
 
     // Update booking status
-    this.updateBookingStatus(booking.id, 'DISPUTED');
+    this.updateBookingStatus(bookingId, 'DISPUTED', 'PROTECTED');
 
     notifyListeners();
     return newDispute;
   },
 
-  resolveDispute(disputeId: string, action: 'release' | 'refund') {
-    const all = this.getDisputes();
-    const dispute = all.find((d) => d.id === disputeId);
+  resolveDispute(disputeId: string, action: 'release' | 'refund', notes?: string) {
+    const disputes = this.getDisputes();
+    const dispute = disputes.find((d) => d.id === disputeId);
+    if (!dispute) return;
 
-    if (dispute) {
-      const updated = all.map((d) =>
-        d.id === disputeId
-          ? {
-              ...d,
-              status: action === 'release' ? ('released' as const) : ('refunded' as const),
-              resolved_at: new Date().toISOString(),
-            }
-          : d
-      );
-      memoryState.disputes = updated;
-      saveItem(STORAGE_KEYS.DISPUTES, updated);
+    const updated = disputes.map((d) =>
+      d.id === disputeId
+        ? {
+            ...d,
+            status: action === 'release' ? ('released' as const) : ('refunded' as const),
+            resolved_at: new Date().toISOString(),
+            resolution_notes: notes || `Resolved by admin: funds ${action}d.`,
+          }
+        : d
+    );
 
-      this.updateBookingStatus(
-        dispute.booking_id,
-        'RESOLVED',
-        action === 'release' ? 'RELEASED' : 'REFUNDED'
-      );
+    memoryState.disputes = updated;
+    saveItem(STORAGE_KEYS.DISPUTES, updated);
 
-      notifyListeners();
-    }
+    // Update booking
+    this.updateBookingStatus(
+      dispute.booking_id,
+      'RESOLVED',
+      action === 'release' ? 'RELEASED' : 'REFUNDED'
+    );
+
+    notifyListeners();
   },
 
-  // ----------------------------------------------------
-  // VERIFICATIONS
-  // ----------------------------------------------------
   getVerifications(): StudentVerification[] {
     return loadItem<StudentVerification[]>(STORAGE_KEYS.VERIFICATIONS, memoryState.verifications);
   },
@@ -681,11 +479,8 @@ export const SkillSetuStore = {
     year: string;
     collegeIdNumber: string;
     collegeEmail: string;
-    idCardDocUrl?: string;
   }) {
     const student = this.getCurrentStudent();
-    const all = this.getVerifications();
-
     const newVerif: StudentVerification = {
       id: `verif-${Date.now()}`,
       student_id: student.id,
@@ -695,38 +490,34 @@ export const SkillSetuStore = {
       year: data.year,
       college_id_number: data.collegeIdNumber,
       college_email: data.collegeEmail,
-      id_card_doc_url: data.idCardDocUrl,
-      status: 'verified', // Instant verified for demo experience
+      status: 'verified', // Instant simulation for demo/prototype
       submitted_at: new Date().toISOString(),
       reviewed_at: new Date().toISOString(),
     };
 
-    const updated = [newVerif, ...all];
+    const all = this.getVerifications();
+    const updated = [newVerif, ...all.filter((v) => v.student_id !== student.id)];
     memoryState.verifications = updated;
     saveItem(STORAGE_KEYS.VERIFICATIONS, updated);
 
-    // Update current student profile
+    // Update student profile status
     const students = this.getStudents();
-    const updatedStudents = students.map((s) => {
-      if (s.id === student.id) {
-        return {
-          ...s,
-          college: data.college,
-          course: data.course,
-          year: data.year,
-          verification_status: 'verified' as VerificationStatus,
-          id_card_doc_url: data.idCardDocUrl || s.id_card_doc_url,
-          badges: s.badges.includes('Verified Student') ? s.badges : ['Verified Student', ...s.badges],
-        };
-      }
-      return s;
-    });
-
+    const updatedStudents = students.map((s) =>
+      s.id === student.id
+        ? {
+            ...s,
+            college: data.college,
+            course: data.course,
+            year: data.year,
+            verification_status: 'verified' as VerificationStatus,
+            badges: s.badges.includes('Verified Student') ? s.badges : ['Verified Student', ...s.badges],
+          }
+        : s
+    );
     memoryState.students = updatedStudents;
     saveItem(STORAGE_KEYS.STUDENTS, updatedStudents);
 
     notifyListeners();
-    return newVerif;
   },
 
   updateVerificationStatus(verifId: string, status: VerificationStatus) {
@@ -746,6 +537,166 @@ export const SkillSetuStore = {
     }
 
     notifyListeners();
+  },
+
+  // ----------------------------------------------------
+  // PORTFOLIOS & PROJECTS
+  // ----------------------------------------------------
+  getPortfolios(): Portfolio[] {
+    return loadItem<Portfolio[]>(STORAGE_KEYS.PORTFOLIOS, memoryState.portfolios);
+  },
+
+  getPortfolioByStudentId(studentId: string): Portfolio | null {
+    const portfolios = this.getPortfolios();
+    return portfolios.find((p) => p.student_id === studentId) || null;
+  },
+
+  getPortfolioByUsername(username: string): Portfolio | null {
+    const portfolios = this.getPortfolios();
+    const cleanUser = username.toLowerCase().trim();
+    return (
+      portfolios.find(
+        (p) =>
+          p.username.toLowerCase() === cleanUser ||
+          p.student_id.toLowerCase() === cleanUser ||
+          p.id.toLowerCase() === cleanUser
+      ) || null
+    );
+  },
+
+  savePortfolio(portfolioData: Partial<Portfolio> & { student_id: string }): Portfolio {
+    const all = this.getPortfolios();
+    const existing = all.find((p) => p.student_id === portfolioData.student_id);
+    const student = this.getStudentById(portfolioData.student_id);
+    const defaultUsername = student
+      ? student.full_name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      : `student-${portfolioData.student_id}`;
+
+    let updatedPortfolio: Portfolio;
+
+    if (existing) {
+      updatedPortfolio = {
+        ...existing,
+        ...portfolioData,
+        updated_at: new Date().toISOString(),
+      };
+      const updatedList = all.map((p) => (p.id === existing.id ? updatedPortfolio : p));
+      memoryState.portfolios = updatedList;
+      saveItem(STORAGE_KEYS.PORTFOLIOS, updatedList);
+    } else {
+      updatedPortfolio = {
+        id: `portfolio-${Date.now()}`,
+        student_id: portfolioData.student_id,
+        username: portfolioData.username || defaultUsername,
+        headline: portfolioData.headline || (student ? `${student.course} | ${student.college}` : 'Student Freelancer'),
+        about_bio: portfolioData.about_bio || (student ? student.about : ''),
+        theme: portfolioData.theme || 'professional',
+        status: portfolioData.status || 'draft',
+        skills: portfolioData.skills || (student ? student.skills : []),
+        projects: portfolioData.projects || [],
+        experience: portfolioData.experience || [],
+        education: portfolioData.education || [],
+        certifications: portfolioData.certifications || [],
+        achievements: portfolioData.achievements || [],
+        views_count: 0,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+      };
+      const updatedList = [updatedPortfolio, ...all];
+      memoryState.portfolios = updatedList;
+      saveItem(STORAGE_KEYS.PORTFOLIOS, updatedList);
+    }
+
+    notifyListeners();
+    return updatedPortfolio;
+  },
+
+  publishPortfolio(studentId: string): Portfolio | null {
+    const portfolio = this.getPortfolioByStudentId(studentId);
+    if (!portfolio) return null;
+    return this.savePortfolio({
+      ...portfolio,
+      student_id: studentId,
+      status: 'published',
+      published_at: portfolio.published_at || new Date().toISOString(),
+    });
+  },
+
+  unpublishPortfolio(studentId: string): Portfolio | null {
+    const portfolio = this.getPortfolioByStudentId(studentId);
+    if (!portfolio) return null;
+    return this.savePortfolio({
+      ...portfolio,
+      student_id: studentId,
+      status: 'unpublished',
+    });
+  },
+
+  addPortfolioProject(
+    studentId: string,
+    projectData: Omit<PortfolioProject, 'id' | 'portfolio_id' | 'created_at'>
+  ): PortfolioProject {
+    let portfolio = this.getPortfolioByStudentId(studentId);
+    if (!portfolio) {
+      portfolio = this.savePortfolio({ student_id: studentId, status: 'draft' });
+    }
+
+    const newProject: PortfolioProject = {
+      ...projectData,
+      id: `proj-${Date.now()}`,
+      portfolio_id: portfolio.id,
+      created_at: new Date().toISOString(),
+    };
+
+    const updatedProjects = [newProject, ...portfolio.projects];
+    this.savePortfolio({
+      ...portfolio,
+      student_id: studentId,
+      projects: updatedProjects,
+    });
+
+    return newProject;
+  },
+
+  updatePortfolioProject(
+    studentId: string,
+    projectId: string,
+    projectData: Partial<PortfolioProject>
+  ): PortfolioProject | null {
+    const portfolio = this.getPortfolioByStudentId(studentId);
+    if (!portfolio) return null;
+
+    const existingProject = portfolio.projects.find((p) => p.id === projectId);
+    if (!existingProject) return null;
+
+    const updatedProject: PortfolioProject = {
+      ...existingProject,
+      ...projectData,
+    };
+
+    const updatedProjects = portfolio.projects.map((p) =>
+      p.id === projectId ? updatedProject : p
+    );
+
+    this.savePortfolio({
+      ...portfolio,
+      student_id: studentId,
+      projects: updatedProjects,
+    });
+
+    return updatedProject;
+  },
+
+  deletePortfolioProject(studentId: string, projectId: string) {
+    const portfolio = this.getPortfolioByStudentId(studentId);
+    if (!portfolio) return;
+
+    const updatedProjects = portfolio.projects.filter((p) => p.id !== projectId);
+    this.savePortfolio({
+      ...portfolio,
+      student_id: studentId,
+      projects: updatedProjects,
+    });
   },
 };
 

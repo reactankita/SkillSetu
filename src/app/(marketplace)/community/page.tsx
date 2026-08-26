@@ -54,10 +54,10 @@ export default function CommunityPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Community Opportunity Board
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Clients post urgent requirements, fest gigs, and project briefs. Verified students respond with custom quotes.
           </p>
         </div>
@@ -75,7 +75,7 @@ export default function CommunityPage() {
       </div>
 
       {/* Filter Chips & Search Bar */}
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
+      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
@@ -83,7 +83,7 @@ export default function CommunityPage() {
             placeholder="Search requirements, keywords, organizers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-10 text-xs bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+            className="pl-10 h-10 text-xs bg-slate-50 border-slate-200"
           />
         </div>
 
@@ -93,8 +93,8 @@ export default function CommunityPage() {
             onClick={() => setSelectedCategory('All')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
               selectedCategory === 'All'
-                ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-2xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? 'bg-slate-900 text-white shadow-2xs'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             All Opportunities ({posts.length})
@@ -107,7 +107,7 @@ export default function CommunityPage() {
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 selectedCategory.toLowerCase() === cat.name.toLowerCase()
                   ? 'bg-orange-600 text-white shadow-2xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
               {cat.name}
@@ -118,7 +118,7 @@ export default function CommunityPage() {
 
       {/* Posts Grid */}
       {filteredPosts.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center space-y-3">
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
           <p className="text-xs text-slate-400">No opportunities found in this category.</p>
           {role === 'client' && (
             <Button

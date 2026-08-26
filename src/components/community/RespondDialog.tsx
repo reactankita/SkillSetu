@@ -29,11 +29,7 @@ export function RespondDialog({ post, open, onOpenChange }: RespondDialogProps) 
     e.preventDefault();
     if (!proposalText.trim()) return;
 
-    store.addCommunityResponse({
-      post_id: post.id,
-      proposal_text: proposalText,
-      proposed_rate: Number(proposedRate),
-    });
+    store.addCommunityResponse(post.id, proposalText, Number(proposedRate));
 
     try {
       confetti({ particleCount: 50, spread: 60 });
@@ -59,17 +55,17 @@ export function RespondDialog({ post, open, onOpenChange }: RespondDialogProps) 
                 <span>Submit Proposal & Quote</span>
               </DialogTitle>
               <DialogDescription>
-                Applying for: <strong className="text-slate-900 dark:text-slate-100">{post.title}</strong>
+                Applying for: <strong className="text-slate-900">{post.title}</strong>
               </DialogDescription>
             </DialogHeader>
 
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs space-y-1 text-slate-700 dark:text-slate-300">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
               <div><strong>Client:</strong> {post.client_name} {post.client_org ? `(${post.client_org})` : ''}</div>
               <div><strong>Target Budget:</strong> {formatINR(post.budget)}</div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Your Proposed Quote (₹)</label>
+              <label className="text-xs font-bold text-slate-800">Your Proposed Quote (₹)</label>
               <Input
                 type="number"
                 required
@@ -80,7 +76,7 @@ export function RespondDialog({ post, open, onOpenChange }: RespondDialogProps) 
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Cover Note & Relevant Experience</label>
+              <label className="text-xs font-bold text-slate-800">Cover Note & Relevant Experience</label>
               <Textarea
                 required
                 placeholder="Explain why you're a great fit, link to similar work samples or portfolio pieces, and your turnaround timeline..."
@@ -102,11 +98,11 @@ export function RespondDialog({ post, open, onOpenChange }: RespondDialogProps) 
           </form>
         ) : (
           <div className="text-center py-6 space-y-3">
-            <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center mx-auto text-emerald-600">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-emerald-600">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Proposal Sent!</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xs mx-auto">
+            <h3 className="text-lg font-bold text-slate-900">Proposal Sent!</h3>
+            <p className="text-xs text-slate-600 max-w-xs mx-auto">
               {post.client_name} has received your quote of {formatINR(proposedRate)}. You will be notified if they accept or shortlist you.
             </p>
             <Button type="button" variant="default" onClick={handleClose} className="mt-2">

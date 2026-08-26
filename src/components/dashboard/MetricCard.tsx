@@ -25,27 +25,27 @@ export function MetricCard({
   className = '',
 }: MetricCardProps) {
   return (
-    <Card className={`p-5 transition-all border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 ${className}`}>
+    <Card className={`p-5 transition-all hover:border-slate-300 ${className}`}>
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
           {title}
         </span>
-        <div className={`p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 ${iconColor}`}>
+        <div className={`p-2 rounded-xl bg-slate-50 border border-slate-100 ${iconColor}`}>
           <Icon className="w-4 h-4" />
         </div>
       </div>
 
       <div className="mt-3">
-        <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+        <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           {value}
         </div>
 
         {(subtitle || trend) && (
-          <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
             {trend && (
               <span
                 className={`inline-flex items-center gap-0.5 font-bold ${
-                  trend.isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                  trend.isPositive ? 'text-emerald-600' : 'text-rose-600'
                 }`}
               >
                 {trend.isPositive ? (

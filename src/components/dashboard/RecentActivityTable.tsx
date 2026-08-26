@@ -29,49 +29,49 @@ export function RecentActivityTable({
       case 'CONFIRMED':
       case 'ACTIVE':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
             <Clock className="w-3 h-3 text-sky-600" />
             <span>Active</span>
           </span>
         );
       case 'REQUESTED':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
             <Clock className="w-3 h-3 text-amber-600" />
             <span>Upcoming</span>
           </span>
         );
       case 'COMPLETED_BY_STUDENT':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
             <CheckCircle2 className="w-3 h-3 text-purple-600" />
             <span>Delivered</span>
           </span>
         );
       case 'CONFIRMED_BY_CLIENT':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
             <span>Completed</span>
           </span>
         );
       case 'CANCELLED':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
             <X className="w-3 h-3" />
             <span>Cancelled</span>
           </span>
         );
       case 'DISPUTED':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+          <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
             <AlertTriangle className="w-3 h-3 text-rose-600" />
             <span>Disputed</span>
           </span>
         );
       case 'RESOLVED':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
             <Check className="w-3 h-3" />
             <span>Resolved</span>
           </span>
@@ -100,7 +100,7 @@ export function RecentActivityTable({
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
-        <thead className="bg-slate-50 dark:bg-slate-800/80 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+        <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200">
           <tr>
             <th className="px-4 py-3">ID</th>
             <th className="px-4 py-3">{role === 'student' ? 'Client' : 'Student Provider'}</th>
@@ -111,7 +111,7 @@ export function RecentActivityTable({
             <th className="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900 font-medium text-slate-700 dark:text-slate-300">
+        <tbody className="divide-y divide-slate-100 bg-white font-medium text-slate-700">
           {bookings.map((booking) => {
             const isCompleted = booking.status === 'CONFIRMED_BY_CLIENT';
             const isDelivered = booking.status === 'COMPLETED_BY_STUDENT';
@@ -119,11 +119,11 @@ export function RecentActivityTable({
             const isDisputed = booking.status === 'DISPUTED';
 
             return (
-              <tr key={booking.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                <td className="px-4 py-3.5 font-mono text-xs text-slate-500 dark:text-slate-400 font-bold">
+              <tr key={booking.id} className="hover:bg-slate-50/80 transition-colors">
+                <td className="px-4 py-3.5 font-mono text-xs text-slate-500 font-bold">
                   {booking.booking_code}
                 </td>
-                <td className="px-4 py-3.5 font-bold text-slate-900 dark:text-slate-100">
+                <td className="px-4 py-3.5 font-bold text-slate-900">
                   {role === 'student' ? (
                     <div>
                       <div>{booking.client_name}</div>
@@ -138,13 +138,13 @@ export function RecentActivityTable({
                     </div>
                   )}
                 </td>
-                <td className="px-4 py-3.5 text-xs text-slate-600 dark:text-slate-300 max-w-[200px] truncate">
+                <td className="px-4 py-3.5 text-xs text-slate-600 max-w-[200px] truncate">
                   {booking.service_title}
                 </td>
-                <td className="px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400">
+                <td className="px-4 py-3.5 text-xs text-slate-500">
                   {formatDate(booking.booking_date)}
                 </td>
-                <td className="px-4 py-3.5 font-extrabold text-slate-900 dark:text-slate-100">
+                <td className="px-4 py-3.5 font-extrabold text-slate-900">
                   {formatINR(booking.total_amount)}
                 </td>
                 <td className="px-4 py-3.5">{getStatusBadge(booking.status)}</td>
@@ -191,7 +191,7 @@ export function RecentActivityTable({
                     <button
                       type="button"
                       onClick={() => onDisputeClick(booking)}
-                      className="text-xs text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-medium px-2 py-1 transition-colors cursor-pointer"
+                      className="text-xs text-slate-400 hover:text-rose-600 font-medium px-2 py-1 transition-colors cursor-pointer"
                     >
                       Report Issue
                     </button>

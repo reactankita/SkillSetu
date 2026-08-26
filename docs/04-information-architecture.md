@@ -30,7 +30,9 @@ SkillSetu is structured into three primary operating environments and a protecte
 | `/reviews` | Student / Client | Review history and ratings received / submitted |
 | `/verification` | Student / Client | Verification center (Student College ID or Client Business ID submission) |
 | `/subscription` | Student Only | Student subscription tiers (Monthly ₹199, Yearly ₹1,499) |
-| `/profile` | Student / Client | Profile editor and unique SkillSetu ID card generator |
+| `/portfolio/builder` | Student Only | Multi-section Portfolio Builder with live preview, 3 themes, project creator |
+| `/portfolio/[username]` | Public / Authenticated | Public shareable personal portfolio with theme rendering and booking CTAs |
+| `/students/[id]/portfolio` | Public / Authenticated | Student portfolio alias route |
 | `/admin` | Admin Only | Protected overview KPI metrics and platform summary |
 | `/admin/[section]` | Admin Only | Tabular moderation (Users, Verifications, Services, Bookings, Payments, Disputes, Reports) |
 

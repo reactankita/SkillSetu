@@ -1,4 +1,4 @@
-import { StudentProfile, ClientProfile, Service, Booking, Review, CommunityPost, CommunityResponse, NotificationItem, Dispute, StudentVerification, Portfolio, PortfolioProject } from '@/types';
+import { StudentProfile, ClientProfile, Service, Booking, Review, CommunityPost, CommunityResponse, NotificationItem, Dispute, StudentVerification, Portfolio } from '@/types';
 
 export const SEED_STUDENTS: StudentProfile[] = [
   {
@@ -401,10 +401,9 @@ export const SEED_CLIENTS: ClientProfile[] = [
     avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop&q=80",
     phone: "+91 98200 99112",
     role: "client",
-    client_type: "organization",
     skillsetu_id: "SK-CL-104827",
     organization_name: "Tech Fest Committee",
-    organization_type: "college",
+    organization_type: "College Festival & Events",
     location: "Mumbai, MH",
     about: "Organizing committee for national-level college technical festivals requiring photography, event apps, stage decoration, and branding.",
     total_spent: 34500,
@@ -420,10 +419,9 @@ export const SEED_CLIENTS: ClientProfile[] = [
     avatar_url: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80",
     phone: "+91 98111 22334",
     role: "client",
-    client_type: "organization",
     skillsetu_id: "SK-CL-104828",
     organization_name: "Bloom Cafe & Roastery",
-    organization_type: "company",
+    organization_type: "F&B / Local Business",
     location: "Pune, MH",
     about: "Artisanal coffee house hiring students for food photography, Instagram reels creation, and weekend event music.",
     total_spent: 18200,
@@ -439,10 +437,9 @@ export const SEED_CLIENTS: ClientProfile[] = [
     avatar_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
     phone: "+91 98451 88990",
     role: "client",
-    client_type: "organization",
     skillsetu_id: "SK-CL-104829",
     organization_name: "Startup Sprint Labs",
-    organization_type: "startup",
+    organization_type: "Startup Incubator",
     location: "Bengaluru, KA",
     about: "Early-stage startup incubator hiring student developers, UI designers, and content writers for MVP sprints.",
     total_spent: 56000,
@@ -1340,138 +1337,453 @@ export const SEED_PORTFOLIOS: Portfolio[] = [
   {
     id: "portfolio-1",
     student_id: "student-1",
-    headline: "Senior Full-Stack Engineer & Next.js Specialist",
-    about: "I build responsive, high-performance web applications, developer platforms, and scalable APIs for fast-moving startups and student ventures. Winner of Smart India Hackathon 2025.",
-    skills: ["React", "Next.js", "TypeScript", "Node.js", "PostgreSQL", "Tailwind CSS", "Supabase", "REST & GraphQL"],
-    education: "B.Tech in Computer Science & Engineering, IIT Bombay (2022 - 2026) • CPI: 9.2/10",
-    experience: "Freelance Full-Stack Developer for 4+ startups; ex-Software Engineering Intern at Razorpay; Tech Lead at Web & Coding Club, IIT Bombay.",
-    achievements: [
-      "Smart India Hackathon 2025 — 1st Place National Winner",
-      "Dean's List of Academic Excellence (IIT Bombay, 2023-2025)",
-      "Published open-source React component library with 2.4k GitHub stars"
-    ],
-    certifications: [
-      "AWS Certified Cloud Practitioner",
-      "Meta Front-End Developer Professional Certificate"
-    ],
-    services_summary: "Custom Web Applications, MVP Development, API Architecture, Performance Optimization.",
-    template: "professional",
+    username: "sarah-chen",
+    headline: "Full-Stack Software Engineer & Next.js Specialist | IIT Bombay '26",
+    about_bio: "Final-year Computer Science undergraduate at IIT Bombay passionate about performant web systems, intuitive design systems, and developer tooling. Built scalable platforms for 3+ funded tech startups and led technical operations for Mood Indigo.",
+    theme: "professional",
     status: "published",
-    updated_at: "2026-08-20T10:00:00Z",
+    skills: ["React", "Next.js", "TypeScript", "Node.js", "PostgreSQL", "Tailwind CSS", "Docker", "REST APIs", "Supabase", "GraphQL"],
     projects: [
       {
-        id: "proj-101",
-        title: "CampusConnect — Decentralized Student Resource Hub",
+        id: "proj-1-1",
+        portfolio_id: "portfolio-1",
+        title: "Mood Indigo Central Fest Portal",
         category: "Technology",
-        description: "A collaborative student resource sharing platform with live collaborative notes, course past papers, and verified tutor matchmaking.",
+        short_description: "High-concurrency registration and ticketing system for Asia's largest college cultural festival.",
+        detailed_description: "Architected a full-stack Next.js application handling live ticket scanning, schedule customization, artist line-up announcements, and team event registrations. Integrated server-side caching with Redis to sustain peak concurrent traffic spikes.",
         role: "Lead Full-Stack Architect",
-        skills: ["Next.js", "TypeScript", "PostgreSQL", "Tailwind CSS", "WebSockets"],
-        date: "Jan 2026",
-        outcome: "Adopted by 3,400+ active university students across 4 campus departments.",
-        image_url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80",
-        project_link: "https://campusconnect-demo.dev"
+        tools_used: ["Next.js", "TypeScript", "PostgreSQL", "Tailwind CSS", "Redis", "Docker"],
+        duration: "4 Months",
+        completion_date: "Dec 2024",
+        client_or_organization: "Mood Indigo, IIT Bombay",
+        project_outcome: "Scaled to 85,000+ registered attendees with sub-100ms response times and zero downtime during headliner announcements.",
+        cover_image_url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80",
+        media: [
+          {
+            id: "m-1-1",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80",
+            title: "Portal Desktop Dashboard",
+            is_cover: true
+          },
+          {
+            id: "m-1-2",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80",
+            title: "Analytics & Ticket Verification",
+            is_cover: false
+          }
+        ],
+        live_url: "https://moodi.org",
+        github_url: "https://github.com/sarahchen/moodi-portal",
+        connected_service_id: "service-1",
+        is_featured: true,
+        created_at: "2025-01-10T10:00:00Z"
       },
       {
-        id: "proj-102",
-        title: "FinPulse — Real-Time SaaS Analytics Dashboard",
+        id: "proj-1-2",
+        portfolio_id: "portfolio-1",
+        title: "DocuFlow AI Resume & Document Parser",
         category: "Technology",
-        description: "High-throughput financial metrics tracking platform processing 100k+ mock transactions per minute with sub-50ms latency.",
-        role: "Backend & UI Developer",
-        skills: ["React", "Node.js", "Redis", "Chart.js", "Docker"],
-        date: "Nov 2025",
-        outcome: "Won 1st prize at Inter-IIT Tech Meet Hackathon.",
-        image_url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80",
-        project_link: "https://finpulse-analytics.dev"
+        short_description: "Automated candidate screening and keyword matching pipeline for student placement cells.",
+        detailed_description: "Developed an asynchronous PDF document parser that extracts structured skills, work history, and academic scores into JSON representations with smart search capabilities.",
+        role: "Solo Developer",
+        tools_used: ["React", "FastAPI", "Python", "Tailwind CSS", "Supabase"],
+        duration: "6 Weeks",
+        completion_date: "Oct 2024",
+        client_or_organization: "IIT Bombay Placement Cell",
+        project_outcome: "Processed 4,500+ student resumes with 94% parsing accuracy, reducing placement team manual review hours by 70%.",
+        cover_image_url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80",
+        media: [
+          {
+            id: "m-1-3",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80",
+            title: "Parser Dashboard",
+            is_cover: true
+          }
+        ],
+        live_url: "https://docuflow-demo.vercel.app",
+        github_url: "https://github.com/sarahchen/docuflow",
+        connected_service_id: "service-1",
+        is_featured: true,
+        created_at: "2024-10-15T12:00:00Z"
       },
       {
-        id: "proj-103",
-        title: "MoodVibe — AI Playlist Generator & Music Matcher",
+        id: "proj-1-3",
+        portfolio_id: "portfolio-1",
+        title: "FinPulse Corporate Financial Reconciler",
         category: "Technology",
-        description: "Interactive web app analyzing facial expressions and user mood to generate customized Spotify playlists.",
-        role: "Frontend Engineer",
-        skills: ["React", "Spotify Web API", "Tailwind CSS", "TensorFlow.js"],
-        date: "Aug 2025",
-        outcome: "Featured on Product Hunt with 450+ upvotes.",
-        image_url: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80"
+        short_description: "Interactive transaction tracking and accounting dashboard built for a fintech seed startup.",
+        detailed_description: "Constructed dynamic multi-tier chart visualizations, invoice status filters, and automated webhook ingestion modules.",
+        role: "Freelance Engineer",
+        tools_used: ["Next.js", "Chart.js", "PostgreSQL", "Prisma"],
+        duration: "2 Months",
+        completion_date: "Aug 2024",
+        client_or_organization: "FinPulse Labs",
+        project_outcome: "Automated daily settlement tracking for 12,000 monthly transactions, saving 12 manual accounting hours per week.",
+        cover_image_url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&auto=format&fit=crop&q=80",
+        media: [
+          {
+            id: "m-1-4",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&auto=format&fit=crop&q=80",
+            title: "Financial Ledger View",
+            is_cover: true
+          }
+        ],
+        is_featured: false,
+        created_at: "2024-08-20T10:00:00Z"
       }
-    ]
+    ],
+    experience: [
+      {
+        id: "exp-1-1",
+        portfolio_id: "portfolio-1",
+        role: "Frontend Engineering Intern",
+        organization: "Razorpay Payments",
+        duration: "May 2025 – Jul 2025",
+        description: "Contributed to the Merchant Dashboard redesign, implemented accessible design tokens, and reduced core web vital render times by 18%.",
+        is_current: false
+      },
+      {
+        id: "exp-1-2",
+        portfolio_id: "portfolio-1",
+        role: "Lead Full-Stack Coordinator",
+        organization: "Mood Indigo, IIT Bombay",
+        duration: "Aug 2024 – Jan 2025",
+        description: "Managed a team of 8 student developers building festival web and mobile platforms used by 85,000+ attendees.",
+        is_current: false
+      }
+    ],
+    education: [
+      {
+        id: "edu-1-1",
+        portfolio_id: "portfolio-1",
+        degree_or_course: "B.Tech Computer Science & Engineering",
+        institution: "Indian Institute of Technology (IIT), Bombay",
+        year: "2022 – 2026",
+        grade_or_score: "CPI: 9.34 / 10.0",
+        highlights: "Dean's List (Top 5%), Teaching Assistant for Data Structures & Algorithms"
+      }
+    ],
+    certifications: [
+      {
+        id: "cert-1-1",
+        portfolio_id: "portfolio-1",
+        title: "AWS Certified Solutions Architect – Associate",
+        issuer: "Amazon Web Services",
+        issue_date: "2024",
+        credential_url: "https://aws.amazon.com/verification"
+      }
+    ],
+    achievements: [
+      {
+        id: "ach-1-1",
+        portfolio_id: "portfolio-1",
+        title: "1st Place – Smart India Hackathon (SIH 2024)",
+        year: "2024",
+        description: "Won national first prize for developing an automated disaster relief coordination network."
+      },
+      {
+        id: "ach-1-2",
+        portfolio_id: "portfolio-1",
+        title: "ACM ICPC Regionalist (Amritapuri)",
+        year: "2024",
+        description: "Ranked among the top 30 collegiate programming teams nationwide."
+      }
+    ],
+    contact_email: "sarah.chen@iitb.ac.in",
+    contact_phone: "+91 98201 44102",
+    social_links: {
+      github: "https://github.com/sarahchen",
+      linkedin: "https://linkedin.com/in/sarahchen-iitb",
+      website: "https://sarahchen.dev"
+    },
+    views_count: 1420,
+    published_at: "2025-01-15T10:00:00Z",
+    updated_at: "2026-02-01T12:00:00Z",
+    created_at: "2025-01-10T10:00:00Z"
   },
   {
     id: "portfolio-2",
     student_id: "student-2",
-    headline: "Festival, Concert & Commercial Portrait Photographer",
-    about: "Capturing candid emotion, high-energy festival crowds, and commercial brand stories across Maharashtra. Equipped with Sony A7 IV and prime G-Master glass.",
-    skills: ["Event Photography", "Portrait Photography", "Adobe Lightroom Classic", "Photoshop", "Studio Strobe Lighting", "Color Grading"],
-    education: "B.Tech in Mechanical Engineering, COEP Technological University (2023 - 2027)",
-    experience: "Official Chief Photographer for MindSpark 2025 & Zest Sports Fest; Media Partner for 12+ live music gigs.",
-    achievements: [
-      "National Geographic India Student Showcase Finalist 2024",
-      "Best Cultural Coverage Award — COEP Annual Awards"
-    ],
-    certifications: [
-      "Sony Alpha Advanced Creative Workshop Certified"
-    ],
-    services_summary: "Live Fest Coverage, Corporate Gatherings, Modeling Headshots, Editorial Portraits.",
-    template: "creative",
+    username: "arjun-mehta",
+    headline: "Concert, Fest & Cinematic Portrait Photographer | COEP Pune",
+    about_bio: "Visual storyteller with 3+ years capturing major college festivals, artist performances, startup product launches, and corporate summits across Pune and Mumbai. Specializing in fast low-light concert work and authentic brand photography.",
+    theme: "creative",
     status: "published",
-    updated_at: "2026-08-22T14:00:00Z",
+    skills: ["Sony Alpha Mirrorless", "Lightroom Classic", "Photoshop", "Studio Lighting", "Color Grading", "Concert Photography", "Event Coverage"],
     projects: [
       {
-        id: "proj-201",
-        title: "MindSpark 2025 — Official Festival Media Documentation",
+        id: "proj-2-1",
+        portfolio_id: "portfolio-2",
+        title: "Zest '25 Annual Sports Festival Media Coverage",
         category: "Photography",
-        description: "Complete photographic coverage of 3-day technical fest with 15,000+ attendees, keynote speakers, and pro-night concert.",
-        role: "Head of Photography",
-        skills: ["Sony A7 IV", "Low Light Shooting", "Lightroom", "Rapid Turnaround"],
-        date: "Feb 2025",
-        outcome: "Delivered 800+ curated and graded photos published across official college portals.",
-        image_url: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop&q=80"
+        short_description: "Comprehensive 4-day athletic coverage for 15,000+ participants across 18 sporting disciplines.",
+        detailed_description: "High-speed action photography covering track & field, basketball finals, and evening awards. Delivered categorized daily press releases within 2 hours of match completion.",
+        role: "Lead Event Photographer",
+        tools_used: ["Sony A7 IV", "70-200mm f/2.8 GM", "Lightroom Classic"],
+        duration: "4 Days",
+        completion_date: "Jan 2025",
+        client_or_organization: "COEP Zest Committee",
+        project_outcome: "Delivered 1,200+ edited shots across 4 days for a 15,000 attendee sports fest, reaching 250k+ social impressions.",
+        cover_image_url: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80",
+        media: [
+          {
+            id: "m-2-1",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80",
+            title: "Main Stage Concert Night",
+            is_cover: true
+          },
+          {
+            id: "m-2-2",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop&q=80",
+            title: "Crowd Emotion Shot",
+            is_cover: false
+          }
+        ],
+        connected_service_id: "service-2",
+        is_featured: true,
+        created_at: "2025-01-20T10:00:00Z"
       },
       {
-        id: "proj-202",
-        title: "Urban Rhythms — Street & Portraiture Series",
+        id: "proj-2-2",
+        portfolio_id: "portfolio-2",
+        title: "SoundWave Indie Music Tour",
         category: "Photography",
-        description: "Editorial portrait series capturing independent musicians and artists in historic Pune alleys.",
-        role: "Solo Photographer & Editor",
-        skills: ["Natural Light", "Color Correction", "Composition"],
-        date: "Oct 2025",
-        outcome: "Exhibited at Pune Art Guild Gallery.",
-        image_url: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80"
+        short_description: "Live concert performance photography for 6 indie rock bands across Pune venues.",
+        detailed_description: "Captured dynamic artist stage presence in challenging low-light conditions with colored spotlights and smoke machines.",
+        role: "Tour Photographer",
+        tools_used: ["Sony A7 III", "35mm f/1.4 GM", "Photoshop"],
+        duration: "2 Weeks",
+        completion_date: "Nov 2024",
+        client_or_organization: "SoundWave Indie Live",
+        project_outcome: "Featured in Rolling Stone India digital edition for live concert coverage, resulting in 4 new booking inquiries.",
+        cover_image_url: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80",
+        media: [
+          {
+            id: "m-2-3",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80",
+            title: "Lead Guitarist Solo",
+            is_cover: true
+          }
+        ],
+        connected_service_id: "service-2",
+        is_featured: true,
+        created_at: "2024-11-25T10:00:00Z"
       }
-    ]
+    ],
+    experience: [
+      {
+        id: "exp-2-1",
+        portfolio_id: "portfolio-2",
+        role: "Head of Media & Visuals",
+        organization: "COEP Photography Club (Spandan)",
+        duration: "Jul 2024 – Present",
+        description: "Mentoring 20 junior photographers, organizing weekly photo walks, and overseeing official institute media archives.",
+        is_current: true
+      }
+    ],
+    education: [
+      {
+        id: "edu-2-1",
+        portfolio_id: "portfolio-2",
+        degree_or_course: "B.Tech Mechanical Engineering",
+        institution: "COEP Technological University, Pune",
+        year: "2023 – 2027",
+        highlights: "Coordinator for MindSpark Technical Festival"
+      }
+    ],
+    certifications: [
+      {
+        id: "cert-2-1",
+        portfolio_id: "portfolio-2",
+        title: "Advanced Studio Lighting & Color Theory Masterclass",
+        issuer: "CreativeLive",
+        issue_date: "2024"
+      }
+    ],
+    achievements: [
+      {
+        id: "ach-2-1",
+        portfolio_id: "portfolio-2",
+        title: "Canon Student Visual Award 2024 – Top 10 National Finalist",
+        year: "2024",
+        description: "Recognized among top student documentary photographers in India."
+      }
+    ],
+    contact_email: "arjun.mehta@coep.ac.in",
+    contact_phone: "+91 98202 33411",
+    social_links: {
+      instagram: "https://instagram.com/arjunmehta.raw",
+      behance: "https://behance.net/arjunmehtaphoto"
+    },
+    views_count: 980,
+    published_at: "2025-01-20T10:00:00Z",
+    updated_at: "2026-02-05T12:00:00Z",
+    created_at: "2025-01-18T10:00:00Z"
+  },
+  {
+    id: "portfolio-3",
+    student_id: "student-3",
+    username: "meera-iyer",
+    headline: "JEE Advanced Physics & Olympiad Mentor | IISc Bangalore",
+    about_bio: "Master's researcher in Theoretical Physics at IISc Bangalore. Mentored 40+ students with 12 students securing top 5,000 ranks in JEE Advanced. Specializing in mechanics, electromagnetism, and conceptual problem-solving methods.",
+    theme: "minimal",
+    status: "published",
+    skills: ["Classical Mechanics", "Electromagnetism", "Calculus-based Physics", "Olympiad Problem Solving", "Concept Mapping", "JEE Advanced Strategy"],
+    projects: [
+      {
+        id: "proj-3-1",
+        portfolio_id: "portfolio-3",
+        title: "Rotational Dynamics Visual Problem Series",
+        category: "Education",
+        short_description: "18 animated problem breakdown videos demystifying complex torque, rolling motion and angular momentum.",
+        detailed_description: "Created comprehensive concept maps and diagrammatic problem decomposition tools for tricky multi-body rolling without slipping problems.",
+        role: "Creator & Physics Mentor",
+        tools_used: ["Manim (Python Animation)", "LaTeX", "GeoGebra"],
+        duration: "3 Months",
+        completion_date: "Dec 2024",
+        project_outcome: "Used by 250+ aspiring JEE students with 94% improvement reported in rotational dynamics chapter tests.",
+        cover_image_url: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&auto=format&fit=crop&q=80",
+        media: [
+          {
+            id: "m-3-1",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&auto=format&fit=crop&q=80",
+            title: "Physics Problem Breakdown",
+            is_cover: true
+          }
+        ],
+        connected_service_id: "service-3",
+        is_featured: true,
+        created_at: "2024-12-10T10:00:00Z"
+      }
+    ],
+    experience: [
+      {
+        id: "exp-3-1",
+        portfolio_id: "portfolio-3",
+        role: "Senior Physics Peer Tutor",
+        organization: "IISc Physics Mentorship Program",
+        duration: "Aug 2023 – Present",
+        description: "Conducting weekly problem-solving recitations for undergraduate physics cohorts.",
+        is_current: true
+      }
+    ],
+    education: [
+      {
+        id: "edu-3-1",
+        portfolio_id: "portfolio-3",
+        degree_or_course: "Integrated M.S. in Physics",
+        institution: "Indian Institute of Science (IISc), Bangalore",
+        year: "2021 – 2026",
+        grade_or_score: "CGPA: 9.6 / 10.0",
+        highlights: "KVPY Fellowship Awardee, Department Gold Medalist"
+      }
+    ],
+    certifications: [],
+    achievements: [
+      {
+        id: "ach-3-1",
+        portfolio_id: "portfolio-3",
+        title: "All India Rank 412 – JEE Advanced",
+        year: "2021",
+        description: "Scored 100th percentile in Physics section."
+      }
+    ],
+    contact_email: "meera.iyer@iisc.ac.in",
+    social_links: {
+      website: "https://meeraphysics.in"
+    },
+    views_count: 650,
+    published_at: "2025-01-10T10:00:00Z",
+    updated_at: "2026-01-28T12:00:00Z",
+    created_at: "2025-01-08T10:00:00Z"
   },
   {
     id: "portfolio-4",
     student_id: "student-4",
-    headline: "Product Designer & Design Systems Specialist",
-    about: "Crafting intuitive digital experiences, design systems, and mobile interfaces grounded in user psychology and clean typography. NID Ahmedabad graduate student.",
-    skills: ["Figma", "Design Systems", "Mobile UI", "User Research", "Wireframing", "Prototyping", "Design Tokens"],
-    education: "M.Des in Information Design, National Institute of Design (NID) Ahmedabad",
-    experience: "Product Design Intern at Swiggy; Freelance UX consultant for 6+ consumer apps.",
-    achievements: [
-      "Red Dot Junior Design Concept Nominee 2025",
-      "1st Prize in UXplore India National UI Challenge"
-    ],
-    certifications: [
-      "Nielsen Norman Group UX Master Certified"
-    ],
-    services_summary: "End-to-End Mobile App UI, Figma Component Libraries, Usability Audits, Web Apps.",
-    template: "minimal",
+    username: "nikita-shah",
+    headline: "Product & Design System Designer | NID Ahmedabad",
+    about_bio: "Product design student at NID Ahmedabad crafting intuitive mobile and web interfaces. Focused on micro-interactions, Figma component architecture, and accessibility.",
+    theme: "creative",
     status: "published",
-    updated_at: "2026-08-21T09:00:00Z",
+    skills: ["Figma", "Design Systems", "User Research", "Interactive Prototyping", "Accessibility (WCAG)", "Wireframing", "Mobile UI"],
     projects: [
       {
-        id: "proj-401",
-        title: "MedEase — Elder Care Prescription & Vitals App",
+        id: "proj-4-1",
+        portfolio_id: "portfolio-4",
+        title: "CarePlus Healthcare Mobile App Redesign",
         category: "Design",
-        description: "Simplified healthcare management app designed specifically for senior citizens with high-contrast accessibility and voice commands.",
+        short_description: "End-to-end UX research and mobile app prototype for chronic disease management.",
+        detailed_description: "Conducted 14 in-depth patient interviews, mapped empathy curves, and created a 40-screen high-fidelity interactive Figma prototype with accessible 16pt typography.",
         role: "Lead Product Designer",
-        skills: ["Figma", "Accessibility WCAG AAA", "User Testing", "Prototyping"],
-        date: "Dec 2025",
-        outcome: "Reduced task completion errors by 64% in usability tests across 40 elderly participants.",
-        image_url: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80"
+        tools_used: ["Figma", "FigJam", "UserZoom", "Tokens Studio"],
+        duration: "7 Weeks",
+        completion_date: "Jan 2025",
+        client_or_organization: "CarePlus Health",
+        project_outcome: "Reduced appointment booking drop-off rate by 24% through 3-step streamlined flow in clinical user testing.",
+        cover_image_url: "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80",
+        media: [
+          {
+            id: "m-4-1",
+            type: "image",
+            url: "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80",
+            title: "CarePlus App Flow",
+            is_cover: true
+          }
+        ],
+        live_url: "https://figma.com/@nikitashah/careplus",
+        connected_service_id: "service-4",
+        is_featured: true,
+        created_at: "2025-01-22T10:00:00Z"
       }
-    ]
+    ],
+    experience: [
+      {
+        id: "exp-4-1",
+        portfolio_id: "portfolio-4",
+        role: "UI/UX Design Intern",
+        organization: "HyperGro Growth Studio",
+        duration: "May 2024 – Jul 2024",
+        description: "Created landing pages and conversion-optimized checkout funnels for D2C brands.",
+        is_current: false
+      }
+    ],
+    education: [
+      {
+        id: "edu-4-1",
+        portfolio_id: "portfolio-4",
+        degree_or_course: "B.Des in Product Design",
+        institution: "National Institute of Design (NID), Ahmedabad",
+        year: "2023 – 2027",
+        highlights: "Merit Scholar, Student Council Design Representative"
+      }
+    ],
+    certifications: [],
+    achievements: [
+      {
+        id: "ach-4-1",
+        portfolio_id: "portfolio-4",
+        title: "Best UI Concept – Designathon India 2024",
+        year: "2024",
+        description: "First place for accessible digital banking interface for rural entrepreneurs."
+      }
+    ],
+    contact_email: "nikita.shah@nid.edu",
+    social_links: {
+      behance: "https://behance.net/nikitashah",
+      linkedin: "https://linkedin.com/in/nikitashah-nid"
+    },
+    views_count: 810,
+    published_at: "2025-01-24T10:00:00Z",
+    updated_at: "2026-02-02T12:00:00Z",
+    created_at: "2025-01-22T10:00:00Z"
   }
 ];
 

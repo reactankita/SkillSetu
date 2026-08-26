@@ -6,22 +6,11 @@ import { useSkillSetuStore } from '@/lib/data/store';
 import { SkillSetuIdCard } from '@/components/brand/SkillSetuIdCard';
 import { VerificationBadge } from '@/components/brand/VerificationBadge';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import {
-  User,
-  GraduationCap,
-  Building2,
-  MapPin,
-  Mail,
-  Phone,
-  ShieldCheck,
-  CheckCircle2,
-  Briefcase,
-  ExternalLink,
-  PlusCircle,
-} from 'lucide-react';
+import { User, GraduationCap, Building2, MapPin, Mail, Phone, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function ProfilePage() {
@@ -29,7 +18,6 @@ export default function ProfilePage() {
   const role = store.getUserRole();
   const student = store.getCurrentStudent();
   const client = store.getCurrentClient();
-  const portfolio = store.getPortfolioByStudentId(student.id);
 
   const isStudent = role === 'student';
   const currentUser = isStudent ? student : client;
@@ -53,10 +41,10 @@ export default function ProfilePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Account Profile & ID
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs sm:text-sm text-slate-500 mt-1">
           Manage your personal details, credentials, and digital SkillSetu verification badge.
         </p>
       </div>
@@ -64,41 +52,14 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Left Form */}
         <div className="lg:col-span-2 space-y-6">
-          {/* STUDENT PORTFOLIO CALLOUT CARD */}
-          {isStudent && (
-            <div className="p-5 rounded-2xl border border-orange-200 dark:border-orange-900/60 bg-orange-50/50 dark:bg-orange-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
-                  <Briefcase className="w-5 h-5" />
-                </div>
-                <div className="space-y-0.5">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Student Portfolio Builder</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    {portfolio?.status === 'published'
-                      ? `Portfolio Published (${portfolio.projects.length} featured projects)`
-                      : 'Showcase your projects and deliverables to get hired faster.'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <Link href="/portfolio">
-                  <Button variant="default" size="sm" className="font-bold text-xs shadow-xs">
-                    {portfolio ? 'Manage Portfolio →' : 'Create Portfolio'}
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-
-          <form onSubmit={handleSave} className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Personal Information</h3>
+          <form onSubmit={handleSave} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-2xs space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base font-bold text-slate-900">Personal Information</h3>
               <VerificationBadge status={currentUser.verification_status} size="sm" />
             </div>
 
             {saved && (
-              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Profile changes updated successfully!</span>
               </div>
@@ -106,7 +67,7 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Full Name</label>
+                <label className="text-xs font-bold text-slate-800">Full Name</label>
                 <Input
                   required
                   value={fullName}
@@ -115,7 +76,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Email Address</label>
+                <label className="text-xs font-bold text-slate-800">Email Address</label>
                 <Input
                   type="email"
                   required
@@ -127,7 +88,7 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Contact Phone Number</label>
+                <label className="text-xs font-bold text-slate-800">Contact Phone Number</label>
                 <Input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -135,7 +96,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800 dark:text-slate-200">City / Location</label>
+                <label className="text-xs font-bold text-slate-800">City / Location</label>
                 <Input
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
@@ -144,27 +105,27 @@ export default function ProfilePage() {
             </div>
 
             {isStudent && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">College / Institution</label>
-                  <Input value={student.college} readOnly className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300" />
+                  <label className="text-xs font-bold text-slate-800">College / Institution</label>
+                  <Input value={student.college} readOnly className="bg-slate-50 text-slate-700" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Course & Year</label>
-                  <Input value={`${student.course} (${student.year})`} readOnly className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300" />
+                  <label className="text-xs font-bold text-slate-800">Course & Year</label>
+                  <Input value={`${student.course} (${student.year})`} readOnly className="bg-slate-50 text-slate-700" />
                 </div>
               </div>
             )}
 
             {!isStudent && (
-              <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Organization / Startup Name</label>
-                <Input defaultValue={client.organization_name || 'Individual Client'} />
+              <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                <label className="text-xs font-bold text-slate-800">Organization / Startup Name</label>
+                <Input defaultValue={client.organization_name || ''} />
               </div>
             )}
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-800 dark:text-slate-200">About Bio</label>
+              <label className="text-xs font-bold text-slate-800">About Bio</label>
               <Textarea
                 rows={4}
                 value={about}
@@ -181,12 +142,56 @@ export default function ProfilePage() {
           </form>
         </div>
 
-        {/* Right Digital ID Card */}
+        {/* Right Digital ID Card & Portfolio Summary */}
         <div className="lg:col-span-1 space-y-4 sticky top-20">
           <SkillSetuIdCard user={currentUser} type={isStudent ? 'student' : 'client'} />
 
-          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs space-y-2 text-xs text-slate-600 dark:text-slate-300">
-            <span className="font-bold text-slate-900 dark:text-slate-100 block">Verified Marketplace Pass</span>
+          {isStudent && (
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                  <GraduationCap className="w-4 h-4 text-orange-600" />
+                  Personal Portfolio
+                </span>
+                {(() => {
+                  const port = store.getPortfolioByStudentId(student.id);
+                  return (
+                    <Badge variant={port?.status === 'published' ? 'emerald' : 'secondary'} className="text-[10px] capitalize">
+                      {port?.status || 'Draft'}
+                    </Badge>
+                  );
+                })()}
+              </div>
+
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Showcase your projects, outcomes, tools, and verified achievements directly to potential clients.
+              </p>
+
+              <div className="pt-2 flex flex-col gap-2">
+                <Link href="/portfolio/builder">
+                  <Button variant="default" size="sm" className="w-full font-bold text-xs">
+                    Open Portfolio Builder →
+                  </Button>
+                </Link>
+                {(() => {
+                  const port = store.getPortfolioByStudentId(student.id);
+                  if (port?.status === 'published') {
+                    return (
+                      <Link href={`/portfolio/${port.username}`} target="_blank">
+                        <Button variant="outline" size="sm" className="w-full text-xs font-semibold">
+                          View Public Portfolio
+                        </Button>
+                      </Link>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
+            </div>
+          )}
+
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2 text-xs text-slate-600">
+            <span className="font-bold text-slate-900 block">Verified Marketplace Pass</span>
             <p className="leading-relaxed text-[11px]">
               This digital pass verifies your status in the SkillSetu network. Use your unique ID code ({currentUser.skillsetu_id}) when contacting support.
             </p>

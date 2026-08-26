@@ -42,20 +42,18 @@ export function EarningsChart() {
   const areaD = `${pathD} L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`;
 
   return (
-    <Card className="overflow-hidden border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+    <Card className="overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-slate-100">
         <div>
-          <CardTitle className="text-base text-slate-900 dark:text-slate-100">Earnings Overview</CardTitle>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Last 7 months verified earnings</p>
+          <CardTitle className="text-base">Earnings Overview</CardTitle>
+          <p className="text-xs text-slate-500 mt-0.5">Last 7 months verified earnings</p>
         </div>
-        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-xs font-semibold">
+        <div className="flex gap-1 bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
           <button
             type="button"
             onClick={() => setTimeframe('7m')}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              timeframe === '7m'
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+              timeframe === '7m' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             7 Months
@@ -64,9 +62,7 @@ export function EarningsChart() {
             type="button"
             onClick={() => setTimeframe('30d')}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              timeframe === '30d'
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+              timeframe === '30d' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             30 Days
@@ -94,12 +90,11 @@ export function EarningsChart() {
                     y1={y}
                     x2={width - 25}
                     y2={y}
-                    stroke="currentColor"
-                    className="text-slate-200 dark:text-slate-800"
+                    stroke="#E2E8F0"
                     strokeDasharray="4 4"
                     strokeWidth="1"
                   />
-                  <text x="0" y={y + 3} className="fill-slate-400 text-[9px] font-semibold">
+                  <text x="0" y={y + 3} fill="#94A3B8" fontSize="9" fontWeight="600">
                     {val === 0 ? '0' : `₹${val / 1000}k`}
                   </text>
                 </g>
@@ -134,7 +129,9 @@ export function EarningsChart() {
                   x={p.x}
                   y={height - 2}
                   textAnchor="middle"
-                  className="fill-slate-500 dark:fill-slate-400 text-[10px] font-semibold"
+                  fill="#64748B"
+                  fontSize="10"
+                  fontWeight="600"
                 >
                   {p.label}
                 </text>
