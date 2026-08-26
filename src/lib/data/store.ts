@@ -137,6 +137,81 @@ export const SkillSetuStore = {
     return loadItem<ClientProfile[]>(STORAGE_KEYS.CLIENTS, memoryState.clients);
   },
 
+  getClientById(id: string): ClientProfile | undefined {
+    return this.getClients().find((c) => c.id === id);
+  },
+
+  getClientByEmail(email: string): ClientProfile | undefined {
+    const clean = email.trim().toLowerCase();
+    return this.getClients().find((c) => c.email.toLowerCase() === clean);
+  },
+
+  registerClient(data: Partial<ClientProfile> & { email: string; full_name: string; client_type: import('@/types').ClientType }): ClientProfile {
+    const clients = this.getClients();
+    const existing = clients.find((c) => c.email.toLowerCase() === data.email.toLowerCase());
+
+    if (existing) {
+      const updatedClient: ClientProfile = {
+        ...existing,
+        ...data,
+        updated_at: new Date().toISOString(),
+      };
+      const updatedList = clients.map((c) => (c.id === existing.id ? updatedClient : c));
+      memoryState.clients = updatedList;
+      saveItem(STORAGE_KEYS.CLIENTS, updatedList);
+      this.setUserRole('client');
+      memoryState.currentClientId = updatedClient.id;
+      saveItem(STORAGE_KEYS.CURRENT_CLIENT_ID, updatedClient.id);
+      notifyListeners();
+      return updatedClient;
+    }
+
+    const randomIdNumber = Math.floor(100000 + Math.random() * 900000);
+    const newClient: ClientProfile = {
+      id: `client-${Date.now()}`,
+      email: data.email,
+      full_name: data.full_name,
+      avatar_url: data.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop&q=80',
+      phone: data.phone || '+91 98000 00000',
+      role: 'client',
+      skillsetu_id: `SK-CL-${randomIdNumber}`,
+      client_type: data.client_type,
+      organization_name: data.organization_name,
+      organization_type: data.organization_type,
+      website: data.website,
+      industry: data.industry,
+      representative_role: data.representative_role,
+      hiring_purpose: data.hiring_purpose || ['Projects', 'Events'],
+      college: data.college,
+      course: data.course,
+      year: data.year,
+      location: data.location || 'Mumbai, MH',
+      about: data.about || 'Client hiring student talent on SkillSetu.',
+      total_spent: 0,
+      hired_count: 0,
+      rating_given_avg: 5.0,
+      verification_status: data.verification_status || 'pending',
+      created_at: new Date().toISOString(),
+    };
+
+    const updatedList = [newClient, ...clients];
+    memoryState.clients = updatedList;
+    saveItem(STORAGE_KEYS.CLIENTS, updatedList);
+    this.setUserRole('client');
+    memoryState.currentClientId = newClient.id;
+    saveItem(STORAGE_KEYS.CURRENT_CLIENT_ID, newClient.id);
+    notifyListeners();
+    return newClient;
+  },
+
+  updateClientProfile(clientId: string, patch: Partial<ClientProfile>) {
+    const clients = this.getClients();
+    const updated = clients.map((c) => (c.id === clientId ? { ...c, ...patch, updated_at: new Date().toISOString() } : c));
+    memoryState.clients = updated;
+    saveItem(STORAGE_KEYS.CLIENTS, updated);
+    notifyListeners();
+  },
+
   getStudentById(id: string): StudentProfile | undefined {
     return this.getStudents().find((s) => s.id === id);
   },

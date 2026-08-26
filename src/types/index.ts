@@ -55,10 +55,20 @@ export interface StudentProfile extends Profile {
   verification_status: VerificationStatus;
 }
 
+export type ClientType = 'individual' | 'company' | 'organization' | 'student_client';
+
 export interface ClientProfile extends Profile {
-  skillsetu_id: string; // e.g. "SK-CL-104827"
+  skillsetu_id: string; // e.g. "SK-CL-204891"
+  client_type: ClientType;
   organization_name?: string;
   organization_type?: string;
+  website?: string;
+  industry?: string;
+  representative_role?: string;
+  hiring_purpose?: string[];
+  college?: string;
+  course?: string;
+  year?: string;
   location: string;
   about: string;
   total_spent: number;

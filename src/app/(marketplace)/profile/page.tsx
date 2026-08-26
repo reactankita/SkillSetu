@@ -118,9 +118,74 @@ export default function ProfilePage() {
             )}
 
             {!isStudent && (
-              <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                <label className="text-xs font-bold text-slate-800">Organization / Startup Name</label>
-                <Input defaultValue={client.organization_name || ''} />
+              <div className="space-y-4 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Client Category</span>
+                  <Badge variant="outline" className="text-xs capitalize font-semibold">
+                    {client.client_type === 'company'
+                      ? 'Startup / Company'
+                      : client.client_type === 'organization'
+                      ? 'Organization / Institution'
+                      : client.client_type === 'student_client'
+                      ? 'Student as Client'
+                      : 'Individual Client'}
+                  </Badge>
+                </div>
+
+                {client.client_type === 'company' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Company / Startup Name</label>
+                      <Input defaultValue={client.organization_name || ''} placeholder="e.g. Acme Corp" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Company Website</label>
+                      <Input defaultValue={client.website || ''} placeholder="https://company.com" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Industry</label>
+                      <Input defaultValue={client.industry || 'Technology & Software'} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Representative Role / Designation</label>
+                      <Input defaultValue={client.representative_role || 'Founder & CEO'} />
+                    </div>
+                  </div>
+                )}
+
+                {client.client_type === 'organization' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Organization Name</label>
+                      <Input defaultValue={client.organization_name || ''} placeholder="e.g. Tech Fest Committee" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Organization Type</label>
+                      <Input defaultValue={client.organization_type || 'Event Committee / Club'} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Official Website / Portal</label>
+                      <Input defaultValue={client.website || ''} placeholder="https://organization.org" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Representative Designation</label>
+                      <Input defaultValue={client.representative_role || 'Convenor & Lead'} />
+                    </div>
+                  </div>
+                )}
+
+                {client.client_type === 'student_client' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Affiliated College</label>
+                      <Input defaultValue={client.college || 'IIT Bombay'} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Course & Year</label>
+                      <Input defaultValue={client.course ? `${client.course} (${client.year || '3rd Year'})` : 'B.Tech CS'} />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
