@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { VerificationBadge } from '@/components/brand/VerificationBadge';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useSkillSetuStore } from '@/lib/data/store';
+import { supabase } from '@/lib/supabase/client';
 import { ClientType, VerificationStatus } from '@/types';
 import {
   User,
@@ -154,6 +156,24 @@ export default function ClientRegisterPage() {
     }
 
     setIsVerifying(true);
+
+    // Call Supabase Auth
+    if (password) {
+      supabase.auth.signUp({
+        email: email.trim(),
+        password: password,
+        options: {
+          data: {
+            full_name:
+              clientType === 'organization' ? orgRepName : clientType === 'business' ? bizRepName : fullName,
+            role: 'client',
+            client_type: clientType,
+            organization_name:
+              clientType === 'organization' ? orgName : clientType === 'business' ? bizName : undefined,
+          },
+        },
+      }).catch((err) => console.log('Supabase signup notice:', err));
+    }
 
     setTimeout(() => {
       const finalStatus: VerificationStatus =

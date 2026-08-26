@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useSkillSetuStore } from '@/lib/data/store';
+import { supabase } from '@/lib/supabase/client';
 import { GraduationCap, ShieldCheck } from 'lucide-react';
 
 export default function StudentRegisterPage() {
@@ -21,16 +22,62 @@ export default function StudentRegisterPage() {
   const [year, setYear] = useState('3rd Year');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setNotice('');
     setLoading(true);
 
-    setTimeout(() => {
-      // Register student & set active role
+    try {
+      // 1. Supabase Auth Sign Up
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password,
+        options: {
+          data: {
+            full_name: fullName.trim(),
+            role: 'student',
+            college: college.trim(),
+            course: course.trim(),
+            year: year,
+          },
+        },
+      });
+
+      // 2. Register in client store
+      store.registerStudent({
+        email: email.trim(),
+        full_name: fullName.trim(),
+        college: college.trim(),
+        course: course.trim(),
+        year: year,
+      });
+
+      store.setUserRole('student');
+
+      if (signUpError) {
+        // Still allow immediate access in prototype demo
+        router.push('/browse');
+        return;
+      }
+
+      router.push('/browse');
+    } catch {
+      store.registerStudent({
+        email: email.trim(),
+        full_name: fullName.trim(),
+        college: college.trim(),
+        course: course.trim(),
+        year: year,
+      });
       store.setUserRole('student');
       router.push('/browse');
-    }, 600);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

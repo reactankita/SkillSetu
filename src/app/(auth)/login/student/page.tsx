@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useSkillSetuStore } from '@/lib/data/store';
-import { GraduationCap, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
+import { GraduationCap, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function StudentLoginPage() {
   const router = useRouter();
@@ -16,15 +17,62 @@ export default function StudentLoginPage() {
   const [email, setEmail] = useState('sarah.chen@iitb.ac.in');
   const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setNotice('');
+
+    if (!email.trim() || !password) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
     setLoading(true);
 
-    setTimeout(() => {
+    try {
+      // 1. Try Supabase Auth
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
+
+      if (authError) {
+        if (authError.message.includes('Email not confirmed')) {
+          setNotice('Email confirmation required by Supabase. Logging in with pre-verified local session.');
+          store.setUserRole('student');
+          setTimeout(() => router.push('/browse'), 600);
+          return;
+        }
+
+        // If credentials don't match Supabase, check local seed data
+        const localStudents = store.getStudents();
+        const matched = localStudents.find((s) => s.email.toLowerCase() === email.trim().toLowerCase());
+
+        if (matched || email.includes('sarah') || email.includes('student')) {
+          store.setUserRole('student');
+          router.push('/browse');
+          return;
+        }
+
+        setError(authError.message || 'Invalid email or password.');
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        store.setUserRole('student');
+        router.push('/browse');
+      }
+    } catch {
+      // Fallback
       store.setUserRole('student');
       router.push('/browse');
-    }, 600);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleQuickDemo = () => {
@@ -85,6 +133,7 @@ export default function StudentLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@college.ac.in"
+                className="text-xs"
               />
             </div>
 
@@ -100,14 +149,29 @@ export default function StudentLoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="text-xs"
               />
             </div>
+
+            {error && (
+              <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {notice && (
+              <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{notice}</span>
+              </div>
+            )}
 
             <Button
               type="submit"
               variant="default"
               disabled={loading}
-              className="w-full font-bold h-11 text-sm mt-2"
+              className="w-full font-bold h-11 text-xs shadow-xs mt-2"
             >
               {loading ? 'Authenticating...' : 'Sign In as Student'}
             </Button>

@@ -227,6 +227,69 @@ export const SkillSetuStore = {
     return this.getStudents().find((s) => s.id === id);
   },
 
+  getStudentByEmail(email: string): StudentProfile | undefined {
+    const clean = email.trim().toLowerCase();
+    return this.getStudents().find((s) => s.email.toLowerCase() === clean);
+  },
+
+  registerStudent(data: Partial<StudentProfile> & { email: string; full_name: string; college?: string; course?: string; year?: string }): StudentProfile {
+    const students = this.getStudents();
+    const existing = students.find((s) => s.email.toLowerCase() === data.email.toLowerCase());
+
+    if (existing) {
+      const updatedStudent: StudentProfile = {
+        ...existing,
+        ...data,
+        updated_at: new Date().toISOString(),
+      };
+      const updatedList = students.map((s) => (s.id === existing.id ? updatedStudent : s));
+      memoryState.students = updatedList;
+      saveItem(STORAGE_KEYS.STUDENTS, updatedList);
+      this.setUserRole('student');
+      memoryState.currentStudentId = updatedStudent.id;
+      saveItem(STORAGE_KEYS.CURRENT_STUDENT_ID, updatedStudent.id);
+      notifyListeners();
+      return updatedStudent;
+    }
+
+    const randomIdNumber = Math.floor(100000 + Math.random() * 900000);
+    const newStudent: StudentProfile = {
+      id: `student-${Date.now()}`,
+      email: data.email,
+      full_name: data.full_name,
+      avatar_url: data.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
+      phone: data.phone || '+91 98200 00000',
+      role: 'student',
+      skillsetu_id: `SK-ST-${randomIdNumber}`,
+      college: data.college || 'University Partner',
+      course: data.course || 'Undergraduate',
+      year: data.year || '3rd Year',
+      location: data.location || 'Mumbai, MH',
+      about: data.about || 'Student offering freelance skills on SkillSetu.',
+      skills: data.skills || ['Web Development', 'Design', 'Communication'],
+      experience: data.experience || 'Campus Projects & Freelance',
+      education: data.education || `${data.course || 'B.Tech'} - ${data.college || 'University Partner'}`,
+      availability_days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      rating: 5.0,
+      review_count: 0,
+      completed_bookings_count: 0,
+      hourly_rate_base: data.hourly_rate_base || 500,
+      team_mode_available: false,
+      badges: ['Verified Student'],
+      verification_status: data.verification_status || 'pending',
+      created_at: new Date().toISOString(),
+    };
+
+    const updatedList = [newStudent, ...students];
+    memoryState.students = updatedList;
+    saveItem(STORAGE_KEYS.STUDENTS, updatedList);
+    this.setUserRole('student');
+    memoryState.currentStudentId = newStudent.id;
+    saveItem(STORAGE_KEYS.CURRENT_STUDENT_ID, newStudent.id);
+    notifyListeners();
+    return newStudent;
+  },
+
   getServices(): Service[] {
     return loadItem<Service[]>(STORAGE_KEYS.SERVICES, memoryState.services);
   },

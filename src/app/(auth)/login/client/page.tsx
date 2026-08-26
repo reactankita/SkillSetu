@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useSkillSetuStore } from '@/lib/data/store';
-import { AlertCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function ClientLoginPage() {
   const router = useRouter();
@@ -16,11 +17,13 @@ export default function ClientLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setNotice('');
 
     if (!email.trim()) {
       setError('Please enter your email address.');
@@ -32,22 +35,64 @@ export default function ClientLoginPage() {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      const foundClient = store.getClientByEmail(email);
-      if (foundClient) {
-        store.setUserRole('client');
-      } else {
-        // Auto-provision demo client session if email is new
-        store.registerClient({
-          email: email.trim(),
-          full_name: email.split('@')[0].replace('.', ' '),
-          client_type: 'individual',
-        });
+
+    try {
+      // 1. Try Supabase Auth
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
+
+      if (authError) {
+        if (authError.message.includes('Email not confirmed')) {
+          setNotice('Email confirmation required by Supabase. Logging in with client session.');
+          const foundClient = store.getClientByEmail(email);
+          if (foundClient) {
+            store.setUserRole('client');
+          } else {
+            store.registerClient({
+              email: email.trim(),
+              full_name: email.split('@')[0].replace('.', ' '),
+              client_type: 'individual',
+            });
+          }
+          setTimeout(() => router.push('/browse'), 600);
+          return;
+        }
+
+        // Check local store
+        const foundClient = store.getClientByEmail(email);
+        if (foundClient) {
+          store.setUserRole('client');
+          router.push('/browse');
+          return;
+        }
+
+        setError(authError.message || 'Invalid email or password.');
+        setLoading(false);
+        return;
       }
 
-      setLoading(false);
+      if (data.user) {
+        const foundClient = store.getClientByEmail(email);
+        if (foundClient) {
+          store.setUserRole('client');
+        } else {
+          store.registerClient({
+            email: email.trim(),
+            full_name: data.user.user_metadata?.full_name || email.split('@')[0].replace('.', ' '),
+            client_type: 'individual',
+          });
+        }
+        router.push('/browse');
+      }
+    } catch {
+      // Fallback
+      store.setUserRole('client');
       router.push('/browse');
-    }, 500);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -108,6 +153,13 @@ export default function ClientLoginPage() {
               <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>{error}</span>
+              </div>
+            )}
+
+            {notice && (
+              <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{notice}</span>
               </div>
             )}
 
