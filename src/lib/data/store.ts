@@ -479,8 +479,12 @@ export const SkillSetuStore = {
     year: string;
     collegeIdNumber: string;
     collegeEmail: string;
+    documentUrl?: string;
+    documentName?: string;
+    status?: VerificationStatus;
   }) {
     const student = this.getCurrentStudent();
+    const verifStatus: VerificationStatus = data.status || 'pending';
     const newVerif: StudentVerification = {
       id: `verif-${Date.now()}`,
       student_id: student.id,
@@ -490,9 +494,10 @@ export const SkillSetuStore = {
       year: data.year,
       college_id_number: data.collegeIdNumber,
       college_email: data.collegeEmail,
-      status: 'verified', // Instant simulation for demo/prototype
+      id_card_doc_url: data.documentUrl || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80',
+      status: verifStatus,
       submitted_at: new Date().toISOString(),
-      reviewed_at: new Date().toISOString(),
+      reviewed_at: verifStatus === 'verified' ? new Date().toISOString() : undefined,
     };
 
     const all = this.getVerifications();
@@ -509,8 +514,10 @@ export const SkillSetuStore = {
             college: data.college,
             course: data.course,
             year: data.year,
-            verification_status: 'verified' as VerificationStatus,
-            badges: s.badges.includes('Verified Student') ? s.badges : ['Verified Student', ...s.badges],
+            verification_status: verifStatus,
+            badges: verifStatus === 'verified'
+              ? (s.badges.includes('Verified Student') ? s.badges : ['Verified Student', ...s.badges])
+              : s.badges.filter((b) => b !== 'Verified Student'),
           }
         : s
     );
