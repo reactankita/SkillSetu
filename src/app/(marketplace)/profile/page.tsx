@@ -122,25 +122,25 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Client Category</span>
                   <Badge variant="outline" className="text-xs capitalize font-semibold">
-                    {client.client_type === 'company'
-                      ? 'Startup / Company'
+                    {client.client_type === 'business'
+                      ? 'Business / Startup'
                       : client.client_type === 'organization'
-                      ? 'Organization / Institution'
-                      : client.client_type === 'student_client'
-                      ? 'Student as Client'
-                      : 'Individual Client'}
+                      ? 'Organization / Committee'
+                      : client.client_type === 'student'
+                      ? 'Student'
+                      : 'Individual'}
                   </Badge>
                 </div>
 
-                {client.client_type === 'company' && (
+                {client.client_type === 'business' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">Company / Startup Name</label>
-                      <Input defaultValue={client.organization_name || ''} placeholder="e.g. Acme Corp" />
+                      <label className="text-xs font-bold text-slate-800">Business / Startup Name</label>
+                      <Input defaultValue={client.organization_name || ''} placeholder="e.g. Startup Sprint Labs" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">Company Website</label>
-                      <Input defaultValue={client.website || ''} placeholder="https://company.com" />
+                      <label className="text-xs font-bold text-slate-800">Business Type</label>
+                      <Input defaultValue={client.business_type || 'Startup'} />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-800">Industry</label>
@@ -161,20 +161,20 @@ export default function ProfilePage() {
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-800">Organization Type</label>
-                      <Input defaultValue={client.organization_type || 'Event Committee / Club'} />
+                      <Input defaultValue={client.organization_type || 'Student Committee'} />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-800">Official Website / Portal</label>
                       <Input defaultValue={client.website || ''} placeholder="https://organization.org" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">Representative Designation</label>
-                      <Input defaultValue={client.representative_role || 'Convenor & Lead'} />
+                      <label className="text-xs font-bold text-slate-800">Representative Position</label>
+                      <Input defaultValue={client.representative_role || 'Coordinator'} />
                     </div>
                   </div>
                 )}
 
-                {client.client_type === 'student_client' && (
+                {client.client_type === 'student' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-800">Affiliated College</label>
@@ -182,7 +182,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-800">Course & Year</label>
-                      <Input defaultValue={client.course ? `${client.course} (${client.year || '3rd Year'})` : 'B.Tech CS'} />
+                      <Input defaultValue={client.course ? `${client.course} (${client.year || '3rd Year'})` : 'B.Tech CS (3rd Year)'} />
                     </div>
                   </div>
                 )}

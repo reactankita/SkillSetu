@@ -7,24 +7,20 @@ import { SkillSetuLogo } from '@/components/brand/SkillSetuLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import { VerificationBadge } from '@/components/brand/VerificationBadge';
 import { useSkillSetuStore } from '@/lib/data/store';
 import { ClientType, VerificationStatus } from '@/types';
 import {
   User,
-  Briefcase,
-  Building2,
   GraduationCap,
+  Building2,
+  Briefcase,
   ShieldCheck,
   CheckCircle2,
   ArrowRight,
   ArrowLeft,
-  Lock,
-  Sparkles,
   AlertCircle,
-  FileText,
-  Upload,
+  Clock,
   Check,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -38,100 +34,79 @@ export default function ClientRegisterPage() {
     setMounted(true);
   }, []);
 
-  const currentRole = mounted ? store.getUserRole() : 'client';
   const currentStudent = mounted ? store.getCurrentStudent() : null;
 
-  // Onboarding Step State (0 = Type Select, 1 = Account, 2 = Details, 3 = Verification, 4 = Complete)
-  const [step, setStep] = useState<number>(0);
+  // Flow State: 'select' | 'form' | 'complete'
+  const [viewState, setViewState] = useState<'select' | 'form' | 'complete'>('select');
+  const [clientType, setClientType] = useState<ClientType | null>(null);
 
-  // Form Fields
-  const [clientType, setClientType] = useState<ClientType>('individual');
+  // Common Fields
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
   const [password, setPassword] = useState('');
-  const [location, setLocation] = useState('Mumbai, MH');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Type-specific fields
-  const [hiringPurposes, setHiringPurposes] = useState<string[]>(['Personal project']);
-  const [companyName, setCompanyName] = useState('');
-  const [companyWebsite, setCompanyWebsite] = useState('');
-  const [industry, setIndustry] = useState('Technology & Software');
-  const [representativeRole, setRepresentativeRole] = useState('Founder & CEO');
+  // Student-specific Fields
+  const [college, setCollege] = useState('');
+  const [course, setCourse] = useState('');
+  const [year, setYear] = useState('3rd Year');
+  const [useExistingStudentVerif, setUseExistingStudentVerif] = useState(true);
+
+  // Organization-specific Fields
   const [orgName, setOrgName] = useState('');
-  const [orgType, setOrgType] = useState('Event Committee');
+  const [orgType, setOrgType] = useState('Student Committee');
   const [orgWebsite, setOrgWebsite] = useState('');
-  const [collegeName, setCollegeName] = useState('');
-  const [courseName, setCourseName] = useState('');
-  const [academicYear, setAcademicYear] = useState('3rd Year');
-  const [aboutBio, setAboutBio] = useState('');
+  const [orgRepName, setOrgRepName] = useState('');
+  const [orgRepRole, setOrgRepRole] = useState('Coordinator');
+  const [orgRepPhone, setOrgRepPhone] = useState('');
+  const [orgRepEmail, setOrgRepEmail] = useState('');
 
-  // Verification state
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [showDigiLockerModal, setShowDigiLockerModal] = useState(false);
-  const [verificationDone, setVerificationDone] = useState(false);
+  // Business-specific Fields
+  const [bizName, setBizName] = useState('');
+  const [bizType, setBizType] = useState('Startup');
+  const [bizIndustry, setBizIndustry] = useState('Tech & Software');
+  const [bizWebsite, setBizWebsite] = useState('');
+  const [bizRepName, setBizRepName] = useState('');
+  const [bizRepRole, setBizRepRole] = useState('Founder');
+  const [bizRepPhone, setBizRepPhone] = useState('');
+  const [bizRepEmail, setBizRepEmail] = useState('');
+
+  // Verification & Status
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>('pending');
+  const [showDigiLockerModal, setShowDigiLockerModal] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [assignedSkillSetuId, setAssignedSkillSetuId] = useState('');
+  const [assignedClientType, setAssignedClientType] = useState<ClientType>('individual');
   const [error, setError] = useState('');
 
-  // Prepopulate if student is already logged in and selects "Student as Client"
-  useEffect(() => {
-    if (clientType === 'student_client' && currentStudent) {
+  // Auto-populate when selecting student if student session exists
+  const handleSelectClientType = (type: ClientType) => {
+    setClientType(type);
+    setError('');
+
+    if (type === 'student' && currentStudent) {
       setFullName(currentStudent.full_name);
       setEmail(currentStudent.email);
-      setPhone(currentStudent.phone || '+91 98200 11223');
-      setCollegeName(currentStudent.college);
-      setCourseName(currentStudent.course);
-      setAcademicYear(currentStudent.year);
+      setCollege(currentStudent.college);
+      setCourse(currentStudent.course);
+      setYear(currentStudent.year);
+      setCity(currentStudent.location || 'Mumbai, MH');
       if (currentStudent.verification_status === 'verified') {
         setVerificationStatus('verified');
-        setVerificationDone(true);
       }
     }
-  }, [clientType, currentStudent]);
 
-  const togglePurpose = (purpose: string) => {
-    setHiringPurposes((prev) =>
-      prev.includes(purpose) ? prev.filter((p) => p !== purpose) : [...prev, purpose]
-    );
+    setViewState('form');
   };
 
-  // Step Navigations & Validations
-  const handleNextFromType = () => {
-    setStep(1);
-  };
-
-  const handleNextFromAccount = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    if (!fullName.trim() || !email.trim() || !password.trim()) {
-      setError('Please fill in all required account fields.');
-      return;
-    }
-    setStep(2);
-  };
-
-  const handleNextFromDetails = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    if (clientType === 'company' && !companyName.trim()) {
-      setError('Please enter your company / startup name.');
-      return;
-    }
-    if (clientType === 'organization' && !orgName.trim()) {
-      setError('Please enter your organization name.');
-      return;
-    }
-    setStep(3);
-  };
-
-  // Simulated DigiLocker Verification for Individuals
-  const handleSimulateDigiLocker = () => {
+  // DigiLocker Simulation for Individuals
+  const handleDigiLockerSimulate = () => {
     setIsVerifying(true);
     setTimeout(() => {
       setIsVerifying(false);
       setShowDigiLockerModal(false);
-      setVerificationDone(true);
       setVerificationStatus('verified');
       try {
         confetti({ particleCount: 50, spread: 60 });
@@ -139,40 +114,100 @@ export default function ClientRegisterPage() {
     }, 1200);
   };
 
-  // Submit Final Registration
-  const handleFinalSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setError('');
+
+    // Validations
+    if (!clientType) return;
+
+    if (clientType === 'individual') {
+      if (!fullName.trim() || !email.trim() || !phone.trim() || !city.trim()) {
+        setError('Please fill in all required personal details.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match. Please verify.');
+        return;
+      }
+    }
+
+    if (clientType === 'student') {
+      if (!fullName.trim() || !email.trim() || !college.trim() || !course.trim()) {
+        setError('Please fill in all student information.');
+        return;
+      }
+    }
+
+    if (clientType === 'organization') {
+      if (!orgName.trim() || !email.trim() || !orgRepName.trim()) {
+        setError('Please provide organization and representative details.');
+        return;
+      }
+    }
+
+    if (clientType === 'business') {
+      if (!bizName.trim() || !email.trim() || !bizRepName.trim()) {
+        setError('Please provide business and representative details.');
+        return;
+      }
+    }
+
     setIsVerifying(true);
 
     setTimeout(() => {
+      const finalStatus: VerificationStatus =
+        clientType === 'individual'
+          ? verificationStatus
+          : clientType === 'student' && useExistingStudentVerif && currentStudent?.verification_status === 'verified'
+          ? 'verified'
+          : verificationStatus === 'verified'
+          ? 'verified'
+          : 'under_review';
+
       const registered = store.registerClient({
-        full_name: fullName,
+        full_name:
+          clientType === 'organization'
+            ? orgRepName
+            : clientType === 'business'
+            ? bizRepName
+            : fullName,
         email: email,
-        phone: phone,
+        phone:
+          clientType === 'organization'
+            ? orgRepPhone || phone
+            : clientType === 'business'
+            ? bizRepPhone || phone
+            : phone,
         client_type: clientType,
-        location: location,
+        location: city || 'Mumbai, MH',
         organization_name:
-          clientType === 'company' ? companyName : clientType === 'organization' ? orgName : undefined,
+          clientType === 'organization' ? orgName : clientType === 'business' ? bizName : undefined,
         organization_type: clientType === 'organization' ? orgType : undefined,
-        website: clientType === 'company' ? companyWebsite : clientType === 'organization' ? orgWebsite : undefined,
-        industry: clientType === 'company' ? industry : undefined,
-        representative_role: representativeRole,
-        hiring_purpose: hiringPurposes,
-        college: clientType === 'student_client' ? collegeName : undefined,
-        course: clientType === 'student_client' ? courseName : undefined,
-        year: clientType === 'student_client' ? academicYear : undefined,
-        about: aboutBio || `Registered as ${clientType} client on SkillSetu.`,
-        verification_status: verificationStatus,
+        business_type: clientType === 'business' ? bizType : undefined,
+        industry: clientType === 'business' ? bizIndustry : undefined,
+        website: clientType === 'organization' ? orgWebsite : clientType === 'business' ? bizWebsite : undefined,
+        representative_name:
+          clientType === 'organization' ? orgRepName : clientType === 'business' ? bizRepName : undefined,
+        representative_role:
+          clientType === 'organization' ? orgRepRole : clientType === 'business' ? bizRepRole : undefined,
+        college: clientType === 'student' ? college : undefined,
+        course: clientType === 'student' ? course : undefined,
+        year: clientType === 'student' ? year : undefined,
+        about: `Registered as ${clientType} client on SkillSetu.`,
+        verification_status: finalStatus,
       });
 
       setAssignedSkillSetuId(registered.skillsetu_id);
+      setAssignedClientType(clientType);
+      setVerificationStatus(finalStatus);
       setIsVerifying(false);
-      setStep(4);
+      setViewState('complete');
 
       try {
-        confetti({ particleCount: 80, spread: 70 });
+        confetti({ particleCount: 75, spread: 65 });
       } catch {}
-    }, 700);
+    }, 600);
   };
 
   return (
@@ -180,43 +215,29 @@ export default function ClientRegisterPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-2xl text-center px-4">
         <SkillSetuLogo size="lg" className="justify-center" />
         <h2 className="mt-4 text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          {step === 0
-            ? 'Welcome to SkillSetu'
-            : step === 4
-            ? 'Your Client Account is Ready'
-            : 'Set Up Your Client Account'}
+          {viewState === 'select'
+            ? 'Create your SkillSetu client account'
+            : viewState === 'complete'
+            ? 'Your SkillSetu client account is ready'
+            : clientType === 'individual'
+            ? 'Create your individual account'
+            : clientType === 'student'
+            ? 'Create your student client account'
+            : clientType === 'organization'
+            ? 'Organization Details'
+            : 'Business / Startup Details'}
         </h2>
-        <p className="mt-1.5 text-xs sm:text-sm text-slate-500 max-w-lg mx-auto">
-          {step === 0
-            ? 'Tell us a little about yourself so we can set up the right client account.'
-            : step === 4
+        <p className="mt-1.5 text-xs sm:text-sm text-slate-500 max-w-xl mx-auto">
+          {viewState === 'select'
+            ? 'Tell us how you plan to use SkillSetu so we can provide the right verification and account experience.'
+            : viewState === 'complete'
             ? 'Start discovering verified student talent, creating gig requests, and hiring with protected payments.'
-            : 'Complete your onboarding in a few quick steps to begin hiring verified student talent.'}
+            : 'Provide your details and complete verification to start hiring verified student talent.'}
         </p>
       </div>
 
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-2xl px-4">
         <div className="bg-white py-8 px-6 sm:px-10 shadow-md rounded-2xl border border-slate-200 space-y-6">
-          {/* Progress Indicator (Steps 1–3) */}
-          {step >= 1 && step <= 3 && (
-            <div className="space-y-2 border-b border-slate-100 pb-5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-900">
-                  {step === 1 && 'Step 1 — Account Information'}
-                  {step === 2 && 'Step 2 — Client & Organization Details'}
-                  {step === 3 && 'Step 3 — Identity & Verification'}
-                </span>
-                <span className="font-semibold text-slate-500 font-mono">Step {step} of 3</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <div className={`h-1.5 rounded-full ${step >= 1 ? 'bg-orange-600' : 'bg-slate-200'}`} />
-                <div className={`h-1.5 rounded-full ${step >= 2 ? 'bg-orange-600' : 'bg-slate-200'}`} />
-                <div className={`h-1.5 rounded-full ${step >= 3 ? 'bg-orange-600' : 'bg-slate-200'}`} />
-              </div>
-            </div>
-          )}
-
-          {/* Validation Alert */}
           {error && (
             <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
@@ -225,286 +246,168 @@ export default function ClientRegisterPage() {
           )}
 
           {/* ========================================================================= */}
-          {/* STEP 0: CHOOSE CLIENT TYPE (4 EQUAL VISUAL CARDS)                         */}
+          {/* 1. FIRST SCREEN: WHAT TYPE OF CLIENT ARE YOU? (4 EQUAL VISUAL CARDS)      */}
           {/* ========================================================================= */}
-          {step === 0 && (
+          {viewState === 'select' && (
             <div className="space-y-6">
               <div className="text-center sm:text-left">
-                <h3 className="text-base font-bold text-slate-900">What type of client are you?</h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Select the category that best describes how you will hire student talent on SkillSetu.
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider text-slate-400">
+                  Account Category
+                </h3>
+                <p className="text-base font-bold text-slate-900 mt-0.5">
+                  What type of client are you?
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* 1. Individual */}
-                <div
-                  onClick={() => setClientType('individual')}
-                  className={`p-5 rounded-2xl border-2 transition-all cursor-pointer text-left space-y-2.5 ${
-                    clientType === 'individual'
-                      ? 'border-orange-500 bg-orange-50/30 shadow-xs'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
-                    <User className="w-5 h-5" />
+                <div className="p-5 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between space-y-4 hover:border-slate-300 transition-colors">
+                  <div className="space-y-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
+                      <User className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">Individual</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        For personal projects, events, tutoring and services.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900">Individual</h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                      For people hiring students for personal projects, events, tutoring, creative work, etc.
-                    </p>
-                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleSelectClientType('individual')}
+                    className="w-full text-xs font-bold justify-between h-9"
+                  >
+                    <span>Continue</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
                 </div>
 
-                {/* 2. Startup / Company */}
-                <div
-                  onClick={() => setClientType('company')}
-                  className={`p-5 rounded-2xl border-2 transition-all cursor-pointer text-left space-y-2.5 ${
-                    clientType === 'company'
-                      ? 'border-orange-500 bg-orange-50/30 shadow-xs'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
-                    <Briefcase className="w-5 h-5" />
+                {/* 2. Student */}
+                <div className="p-5 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between space-y-4 hover:border-slate-300 transition-colors">
+                  <div className="space-y-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
+                      <GraduationCap className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">Student</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        Hire another student using your student identity.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900">Startup / Company</h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                      For startups, companies and businesses hiring student talent.
-                    </p>
-                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleSelectClientType('student')}
+                    className="w-full text-xs font-bold justify-between h-9"
+                  >
+                    <span>Continue</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
                 </div>
 
-                {/* 3. Organization / Institution */}
-                <div
-                  onClick={() => setClientType('organization')}
-                  className={`p-5 rounded-2xl border-2 transition-all cursor-pointer text-left space-y-2.5 ${
-                    clientType === 'organization'
-                      ? 'border-orange-500 bg-orange-50/30 shadow-xs'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
-                    <Building2 className="w-5 h-5" />
+                {/* 3. Organization / Committee */}
+                <div className="p-5 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between space-y-4 hover:border-slate-300 transition-colors">
+                  <div className="space-y-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">Organization / Committee</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        For colleges, clubs, committees, NGOs and institutions.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900">Organization / Institution</h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                      For colleges, clubs, NGOs, societies, event committees and other organizations.
-                    </p>
-                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleSelectClientType('organization')}
+                    className="w-full text-xs font-bold justify-between h-9"
+                  >
+                    <span>Continue</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
                 </div>
 
-                {/* 4. Student as Client */}
-                <div
-                  onClick={() => setClientType('student_client')}
-                  className={`p-5 rounded-2xl border-2 transition-all cursor-pointer text-left space-y-2.5 ${
-                    clientType === 'student_client'
-                      ? 'border-orange-500 bg-orange-50/30 shadow-xs'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
-                    <GraduationCap className="w-5 h-5" />
+                {/* 4. Business / Startup */}
+                <div className="p-5 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between space-y-4 hover:border-slate-300 transition-colors">
+                  <div className="space-y-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
+                      <Briefcase className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">Business / Startup</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        For startups, companies, businesses and agencies.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900">Student as Client</h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                      For students who want to hire another student for a project, event or service.
-                    </p>
-                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleSelectClientType('business')}
+                    className="w-full text-xs font-bold justify-between h-9"
+                  >
+                    <span>Continue</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <Link href="/login/client" className="text-xs font-semibold text-slate-600 hover:underline">
-                  Already have an account? Sign In
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-slate-500">Already have a client account?</span>
+                <Link href="/login/client" className="font-bold text-orange-600 hover:underline">
+                  Sign In →
                 </Link>
-                <Button
-                  type="button"
-                  variant="default"
-                  onClick={handleNextFromType}
-                  className="font-bold text-xs px-6 h-10 shadow-xs"
-                >
-                  Continue →
-                </Button>
               </div>
             </div>
           )}
 
           {/* ========================================================================= */}
-          {/* STEP 1: ACCOUNT INFORMATION                                               */}
+          {/* 2. REGISTRATION FORM BY CLIENT TYPE                                       */}
           {/* ========================================================================= */}
-          {step === 1 && (
-            <form onSubmit={handleNextFromAccount} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-800">
-                    {clientType === 'company' || clientType === 'organization'
-                      ? 'Authorized Representative Name *'
-                      : 'Full Name *'}
-                  </label>
-                  <Input
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Rohan Kapoor"
-                    className="text-xs"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-800">
-                    {clientType === 'company'
-                      ? 'Work / Business Email *'
-                      : clientType === 'organization'
-                      ? 'Official Organization Email *'
-                      : clientType === 'student_client'
-                      ? 'Student Email (.edu / .ac.in) *'
-                      : 'Email Address *'}
-                  </label>
-                  <Input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@company.com"
-                    className="text-xs"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-800">Phone Number *</label>
-                  <Input
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98200 00000"
-                    className="text-xs"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-800">City / Location *</label>
-                  <Input
-                    required
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g. Mumbai, MH"
-                    className="text-xs"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800">Account Password *</label>
-                <Input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimum 8 characters"
-                  className="text-xs"
-                />
-              </div>
-
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <Button
+          {viewState === 'form' && clientType && (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Back to selector */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <button
                   type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setStep(0)}
-                  className="text-xs font-semibold"
+                  onClick={() => setViewState('select')}
+                  className="inline-flex items-center text-xs font-semibold text-slate-500 hover:text-slate-800"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 mr-1" />
-                  Back
-                </Button>
-                <Button type="submit" variant="default" className="font-bold text-xs px-6 h-10 shadow-xs">
-                  Continue to Details →
-                </Button>
+                  Change Account Type
+                </button>
+                <Badge variant="outline" className="text-[11px] capitalize font-mono">
+                  {clientType} Account
+                </Badge>
               </div>
-            </form>
-          )}
 
-          {/* ========================================================================= */}
-          {/* STEP 2: CLIENT / ORGANIZATION DETAILS                                     */}
-          {/* ========================================================================= */}
-          {step === 2 && (
-            <form onSubmit={handleNextFromDetails} className="space-y-5">
-              {/* Individual Form */}
+              {/* ----------------- 4. INDIVIDUAL FORM ----------------- */}
               {clientType === 'individual' && (
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-800 block">
-                      What do you plan to hire students for? (Select all that apply)
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        'Personal project',
-                        'Event & Photography',
-                        'Tutoring & Academics',
-                        'Creative & Design',
-                        'Software & Web',
-                        'Other',
-                      ].map((item) => {
-                        const active = hiringPurposes.includes(item);
-                        return (
-                          <button
-                            type="button"
-                            key={item}
-                            onClick={() => togglePurpose(item)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-                              active
-                                ? 'bg-orange-50 border-orange-300 text-orange-800'
-                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                            }`}
-                          >
-                            {active && <Check className="w-3 h-3 inline mr-1 text-orange-600 -mt-0.5" />}
-                            {item}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-800">Short Bio / About (Optional)</label>
-                    <Textarea
-                      rows={3}
-                      value={aboutBio}
-                      onChange={(e) => setAboutBio(e.target.value)}
-                      placeholder="Brief note about the types of projects or assistance you need..."
-                      className="text-xs"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Startup / Company Form */}
-              {clientType === 'company' && (
-                <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">Company / Startup Name *</label>
+                      <label className="text-xs font-bold text-slate-800">Full Name *</label>
                       <Input
                         required
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        placeholder="e.g. GrowthCraft Labs"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="e.g. Ananya Deshmukh"
                         className="text-xs"
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">Company Website</label>
+                      <label className="text-xs font-bold text-slate-800">Email Address *</label>
                       <Input
-                        value={companyWebsite}
-                        onChange={(e) => setCompanyWebsite(e.target.value)}
-                        placeholder="https://company.com"
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="name@email.com"
                         className="text-xs"
                       />
                     </div>
@@ -512,42 +415,176 @@ export default function ClientRegisterPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">Industry</label>
-                      <select
-                        value={industry}
-                        onChange={(e) => setIndustry(e.target.value)}
-                        className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      >
-                        <option value="Technology & Software">Technology & Software</option>
-                        <option value="E-Commerce & Retail">E-Commerce & Retail</option>
-                        <option value="Media & Creative Agency">Media & Creative Agency</option>
-                        <option value="EdTech & Education">EdTech & Education</option>
-                        <option value="FinTech & Finance">FinTech & Finance</option>
-                        <option value="Food & Beverage">Food & Beverage</option>
-                        <option value="Other Industry">Other Industry</option>
-                      </select>
+                      <label className="text-xs font-bold text-slate-800">Phone Number *</label>
+                      <Input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+91 98200 00000"
+                        className="text-xs"
+                      />
                     </div>
-
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">Your Role / Designation</label>
-                      <select
-                        value={representativeRole}
-                        onChange={(e) => setRepresentativeRole(e.target.value)}
-                        className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      >
-                        <option value="Founder / Co-Founder">Founder / Co-Founder</option>
-                        <option value="HR & Talent Lead">HR & Talent Lead</option>
-                        <option value="Project / Product Manager">Project / Product Manager</option>
-                        <option value="Marketing Lead">Marketing Lead</option>
-                        <option value="Operations Manager">Operations Manager</option>
-                        <option value="Other Role">Other Role</option>
-                      </select>
+                      <label className="text-xs font-bold text-slate-800">City / Location *</label>
+                      <Input
+                        required
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="e.g. Mumbai, MH"
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Password *</label>
+                      <Input
+                        type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Minimum 8 characters"
+                        className="text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Confirm Password *</label>
+                      <Input
+                        type="password"
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Re-enter password"
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Identity Verification Section */}
+                  <div className="pt-2 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Identity Verification</h4>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Identity verification helps SkillSetu maintain a trusted marketplace.
+                      </p>
+                      <div className="text-[11px] text-slate-500 bg-white p-2.5 rounded-lg border border-slate-200">
+                        🔒 <strong>Privacy Protected:</strong> SkillSetu uses authorized verification channels and never stores raw Aadhaar numbers or government documents.
+                      </div>
+                      {verificationStatus === 'verified' ? (
+                        <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          <span>✓ Verified Client (DigiLocker Identity Verified)</span>
+                        </div>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowDigiLockerModal(true)}
+                          className="w-full text-xs font-bold h-9"
+                        >
+                          <ShieldCheck className="w-4 h-4 mr-1.5 text-orange-600" />
+                          Continue with DigiLocker (Prototype verification)
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Organization / Institution Form */}
+              {/* ----------------- 5. STUDENT AS CLIENT FORM ----------------- */}
+              {clientType === 'student' && (
+                <div className="space-y-4">
+                  {currentStudent && currentStudent.verification_status === 'verified' && (
+                    <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>✓ Existing student verification found (<strong>{currentStudent.college}</strong>)</span>
+                      </div>
+                      <Badge variant="emerald" className="text-[10px]">Use my existing student verification</Badge>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Full Name *</label>
+                      <Input
+                        required
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="e.g. Sarah Chen"
+                        className="text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Student Email *</label>
+                      <Input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="sarah.chen@iitb.ac.in"
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">College / University *</label>
+                      <Input
+                        required
+                        value={college}
+                        onChange={(e) => setCollege(e.target.value)}
+                        placeholder="e.g. IIT Bombay"
+                        className="text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Course *</label>
+                      <Input
+                        required
+                        value={course}
+                        onChange={(e) => setCourse(e.target.value)}
+                        placeholder="e.g. B.Tech Computer Science"
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Academic Year</label>
+                      <select
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                        className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      >
+                        <option value="1st Year">1st Year</option>
+                        <option value="2nd Year">2nd Year</option>
+                        <option value="3rd Year">3rd Year</option>
+                        <option value="Final Year">Final Year</option>
+                        <option value="Postgraduate">Postgraduate</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Password *</label>
+                      <Input
+                        type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Minimum 8 characters"
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ----------------- 6. ORGANIZATION / COMMITTEE FORM ----------------- */}
               {clientType === 'organization' && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -557,241 +594,273 @@ export default function ClientRegisterPage() {
                         required
                         value={orgName}
                         onChange={(e) => setOrgName(e.target.value)}
-                        placeholder="e.g. Mood Indigo Fest Committee"
+                        placeholder="e.g. Tech Fest Committee / Rotaract"
                         className="text-xs"
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">Organization Type</label>
+                      <label className="text-xs font-bold text-slate-800">Organization Type *</label>
                       <select
                         value={orgType}
                         onChange={(e) => setOrgType(e.target.value)}
                         className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
                       >
-                        <option value="College / University">College / University</option>
-                        <option value="Student Club / Society">Student Club / Society</option>
-                        <option value="Event Committee">Event Committee</option>
-                        <option value="Non-Profit / NGO">Non-Profit / NGO</option>
-                        <option value="Educational Institution">Educational Institution</option>
+                        <option value="College / Institution">College / Institution</option>
+                        <option value="Student Committee">Student Committee</option>
+                        <option value="College Club">College Club</option>
+                        <option value="NGO">NGO</option>
+                        <option value="Society">Society</option>
                         <option value="Community Organization">Community Organization</option>
                         <option value="Other">Other</option>
                       </select>
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-800">Official Website or Portal</label>
-                    <Input
-                      value={orgWebsite}
-                      onChange={(e) => setOrgWebsite(e.target.value)}
-                      placeholder="https://fest-organization.org"
-                      className="text-xs"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Official Email *</label>
+                      <Input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="contact@techfest.org"
+                        className="text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Website (Optional)</label>
+                      <Input
+                        value={orgWebsite}
+                        onChange={(e) => setOrgWebsite(e.target.value)}
+                        placeholder="https://techfest.org"
+                        className="text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Location *</label>
+                      <Input
+                        required
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="e.g. Mumbai, MH"
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Representative Details */}
+                  <div className="pt-2 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Representative Details
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-800">Representative Full Name *</label>
+                        <Input
+                          required
+                          value={orgRepName}
+                          onChange={(e) => setOrgRepName(e.target.value)}
+                          placeholder="e.g. Rohan Kapoor"
+                          className="text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-800">Role / Position *</label>
+                        <select
+                          value={orgRepRole}
+                          onChange={(e) => setOrgRepRole(e.target.value)}
+                          className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        >
+                          <option value="Coordinator">Coordinator</option>
+                          <option value="Committee Member">Committee Member</option>
+                          <option value="Representative">Representative</option>
+                          <option value="Administrator">Administrator</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-800">Phone *</label>
+                        <Input
+                          type="tel"
+                          required
+                          value={orgRepPhone}
+                          onChange={(e) => setOrgRepPhone(e.target.value)}
+                          placeholder="+91 98200 00000"
+                          className="text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-800">Password *</label>
+                        <Input
+                          type="password"
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Minimum 8 characters"
+                          className="text-xs"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Student as Client Form */}
-              {clientType === 'student_client' && (
+              {/* ----------------- 7. BUSINESS / STARTUP FORM ----------------- */}
+              {clientType === 'business' && (
                 <div className="space-y-4">
-                  {currentStudent && currentStudent.verification_status === 'verified' && (
-                    <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>
-                        Your existing student verification (<strong>{currentStudent.college}</strong>) will be
-                        automatically applied to your client profile.
-                      </span>
-                    </div>
-                  )}
-
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">College / University *</label>
+                      <label className="text-xs font-bold text-slate-800">Business / Startup Name *</label>
                       <Input
                         required
-                        value={collegeName}
-                        onChange={(e) => setCollegeName(e.target.value)}
-                        placeholder="e.g. IIT Bombay"
+                        value={bizName}
+                        onChange={(e) => setBizName(e.target.value)}
+                        placeholder="e.g. Startup Sprint Labs"
                         className="text-xs"
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-800">Course & Department *</label>
+                      <label className="text-xs font-bold text-slate-800">Organization Type *</label>
+                      <select
+                        value={bizType}
+                        onChange={(e) => setBizType(e.target.value)}
+                        className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      >
+                        <option value="Startup">Startup</option>
+                        <option value="Company">Company</option>
+                        <option value="Small Business">Small Business</option>
+                        <option value="Agency">Agency</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Industry</label>
                       <Input
-                        required
-                        value={courseName}
-                        onChange={(e) => setCourseName(e.target.value)}
-                        placeholder="e.g. B.Tech Computer Science"
+                        value={bizIndustry}
+                        onChange={(e) => setBizIndustry(e.target.value)}
+                        placeholder="e.g. Tech & Software"
                         className="text-xs"
                       />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Business Email *</label>
+                      <Input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="founder@startupsprint.co"
+                        className="text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">Website</label>
+                      <Input
+                        value={bizWebsite}
+                        onChange={(e) => setBizWebsite(e.target.value)}
+                        placeholder="https://startupsprint.co"
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Representative Details */}
+                  <div className="pt-2 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Representative Details
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-800">Representative Full Name *</label>
+                        <Input
+                          required
+                          value={bizRepName}
+                          onChange={(e) => setBizRepName(e.target.value)}
+                          placeholder="e.g. Sneha Pillai"
+                          className="text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-800">Role *</label>
+                        <select
+                          value={bizRepRole}
+                          onChange={(e) => setBizRepRole(e.target.value)}
+                          className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        >
+                          <option value="Founder">Founder</option>
+                          <option value="Co-founder">Co-founder</option>
+                          <option value="HR">HR</option>
+                          <option value="Project Manager">Project Manager</option>
+                          <option value="Marketing">Marketing</option>
+                          <option value="Operations">Operations</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-800">Phone *</label>
+                        <Input
+                          type="tel"
+                          required
+                          value={bizRepPhone}
+                          onChange={(e) => setBizRepPhone(e.target.value)}
+                          placeholder="+91 98451 00000"
+                          className="text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-800">Password *</label>
+                        <Input
+                          type="password"
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Minimum 8 characters"
+                          className="text-xs"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
+              {/* Submit Buttons */}
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setStep(1)}
+                  onClick={() => setViewState('select')}
                   className="text-xs font-semibold"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 mr-1" />
                   Back
                 </Button>
-                <Button type="submit" variant="default" className="font-bold text-xs px-6 h-10 shadow-xs">
-                  Continue to Verification →
+                <Button
+                  type="submit"
+                  variant="default"
+                  disabled={isVerifying}
+                  className="font-bold text-xs px-6 h-10 shadow-xs"
+                >
+                  {isVerifying ? 'Creating Account...' : 'Complete Registration →'}
                 </Button>
               </div>
             </form>
           )}
 
           {/* ========================================================================= */}
-          {/* STEP 3: IDENTITY & BUSINESS VERIFICATION                                  */}
+          {/* 3. COMPLETION SCREEN                                                      */}
           {/* ========================================================================= */}
-          {step === 3 && (
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-base font-bold text-slate-900">
-                  {clientType === 'individual'
-                    ? 'Identity Verification'
-                    : clientType === 'student_client'
-                    ? 'Student Credential Sync'
-                    : 'Organization Authenticity Check'}
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Verify your identity to become a trusted SkillSetu client and post opportunities.
-                </p>
-              </div>
-
-              {/* INDIVIDUAL CLIENT: DIGILOCKER SIMULATION */}
-              {clientType === 'individual' && (
-                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-orange-100 border border-orange-200 flex items-center justify-center shrink-0 text-orange-700 font-bold">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="text-xs font-bold text-slate-900">
-                        DigiLocker Identity Verification
-                      </h4>
-                      <p className="text-[11px] text-slate-600 leading-relaxed">
-                        Verify identity via government-authorized DigiLocker channel. SkillSetu never stores raw Aadhaar numbers or documents.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500 text-[11px] space-y-1">
-                    <span className="font-bold text-slate-700 block">🔒 Privacy & Compliance Note</span>
-                    <p>
-                      Identity verification confirms your client authenticity to student freelancers. Simulated verification is used in this environment.
-                    </p>
-                  </div>
-
-                  {verificationDone ? (
-                    <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>DigiLocker Identity Verification Complete (Verified Status Active)</span>
-                    </div>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="default"
-                      onClick={() => setShowDigiLockerModal(true)}
-                      className="w-full text-xs font-bold h-10 shadow-xs"
-                    >
-                      <ShieldCheck className="w-4 h-4 mr-1.5" />
-                      Continue with DigiLocker (Simulated)
-                    </Button>
-                  )}
-                </div>
-              )}
-
-              {/* COMPANY / ORGANIZATION VERIFICATION */}
-              {(clientType === 'company' || clientType === 'organization') && (
-                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-teal-100 border border-teal-200 flex items-center justify-center shrink-0 text-teal-700">
-                      <Building2 className="w-5 h-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="text-xs font-bold text-slate-900">
-                        {clientType === 'company' ? 'Work Domain & Business Authentication' : 'Official Letterhead & Club Verification'}
-                      </h4>
-                      <p className="text-[11px] text-slate-600 leading-relaxed">
-                        Organizations are initially placed in <strong>Verification Pending</strong> and fast-tracked by moderation.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-white border border-slate-200 text-xs space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-800">Verification Factor</span>
-                      <Badge variant="orange" className="text-[10px]">Work Email & Domain</Badge>
-                    </div>
-                    <p className="text-[11px] text-slate-500">
-                      Domain: <strong>{email.split('@')[1] || 'organization.org'}</strong> (Simulated automated check)
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
-                    <span>Initial Status: <strong>Verification Pending (Under Review)</strong></span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setVerificationStatus('verified');
-                        setVerificationDone(true);
-                      }}
-                      className="text-xs font-bold text-amber-800 underline hover:text-amber-950"
-                    >
-                      {verificationDone ? '✓ Verified (Simulated)' : 'Simulate 1-Click Approval'}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* STUDENT AS CLIENT */}
-              {clientType === 'student_client' && (
-                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="w-5 h-5 text-orange-600" />
-                    <h4 className="text-xs font-bold text-slate-900">Student Identity Linked</h4>
-                  </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Your student verification status is synchronized with your client profile, enabling you to switch roles seamlessly.
-                  </p>
-                </div>
-              )}
-
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setStep(2)}
-                  className="text-xs font-semibold"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5 mr-1" />
-                  Back
-                </Button>
-                <Button
-                  type="button"
-                  variant="default"
-                  disabled={isVerifying}
-                  onClick={handleFinalSubmit}
-                  className="font-bold text-xs px-6 h-10 shadow-xs"
-                >
-                  {isVerifying ? 'Finalizing Account...' : 'Complete Registration →'}
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* ========================================================================= */}
-          {/* STEP 4: COMPLETION SCREEN                                                 */}
-          {/* ========================================================================= */}
-          {step === 4 && (
+          {viewState === 'complete' && (
             <div className="text-center space-y-6 py-2">
               <div className="w-14 h-14 bg-emerald-100 border border-emerald-200 rounded-2xl flex items-center justify-center mx-auto text-emerald-700 shadow-xs">
                 <CheckCircle2 className="w-8 h-8" />
@@ -799,11 +868,11 @@ export default function ClientRegisterPage() {
 
               <div className="space-y-1">
                 <h3 className="text-xl font-extrabold text-slate-900">
-                  Your SkillSetu Client Account is Ready
+                  Your SkillSetu client account is ready
                 </h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto">
                   {verificationStatus === 'verified'
-                    ? 'Your client credentials are fully verified. You can now hire students with protected payments.'
+                    ? 'Your client credentials are fully verified. You can now discover talent and hire students.'
                     : 'Your account is ready. Verification is currently under review by our moderation team.'}
                 </p>
               </div>
@@ -815,16 +884,36 @@ export default function ClientRegisterPage() {
                     <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
                       Client ID Pass
                     </span>
-                    <h4 className="text-sm font-bold text-white mt-0.5">{fullName}</h4>
+                    <h4 className="text-sm font-bold text-white mt-0.5">
+                      {assignedClientType === 'organization'
+                        ? orgName
+                        : assignedClientType === 'business'
+                        ? bizName
+                        : fullName}
+                    </h4>
                   </div>
-                  <VerificationBadge status={verificationStatus} size="sm" />
+                  <VerificationBadge
+                    status={verificationStatus}
+                    label={
+                      verificationStatus === 'verified'
+                        ? assignedClientType === 'organization'
+                          ? 'Verified Organization'
+                          : assignedClientType === 'business'
+                          ? 'Verified Business'
+                          : assignedClientType === 'student'
+                          ? 'Verified Student'
+                          : 'Verified Client'
+                        : undefined
+                    }
+                    size="sm"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
                     <span className="text-[10px] text-slate-400 block">Category</span>
                     <span className="font-semibold text-slate-200 capitalize">
-                      {clientType.replace('_', ' ')}
+                      {assignedClientType}
                     </span>
                   </div>
                   <div>
@@ -877,7 +966,7 @@ export default function ClientRegisterPage() {
                 SkillSetu securely checks identity verification status through the authorized DigiLocker consent framework without storing government identity numbers.
               </p>
               <div className="font-mono text-[11px] bg-white p-2 rounded border border-slate-200 text-slate-800">
-                User: <strong>{fullName}</strong> ({email})
+                User: <strong>{fullName || 'Individual Client'}</strong> ({email || 'client@email.com'})
               </div>
             </div>
 
@@ -895,10 +984,10 @@ export default function ClientRegisterPage() {
                 type="button"
                 variant="default"
                 disabled={isVerifying}
-                onClick={handleSimulateDigiLocker}
+                onClick={handleDigiLockerSimulate}
                 className="text-xs font-bold h-9"
               >
-                {isVerifying ? 'Connecting to DigiLocker...' : 'Authorize & Verify (Simulated)'}
+                {isVerifying ? 'Connecting...' : 'Authorize & Verify (Prototype)'}
               </Button>
             </div>
           </div>

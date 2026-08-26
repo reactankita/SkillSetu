@@ -167,6 +167,15 @@ export const SkillSetuStore = {
     }
 
     const randomIdNumber = Math.floor(100000 + Math.random() * 900000);
+    const idPrefix =
+      data.client_type === 'organization'
+        ? 'SK-ORG'
+        : data.client_type === 'business'
+        ? 'SK-BIZ'
+        : data.client_type === 'student'
+        ? 'SK-ST'
+        : 'SK-CL';
+
     const newClient: ClientProfile = {
       id: `client-${Date.now()}`,
       email: data.email,
@@ -174,19 +183,21 @@ export const SkillSetuStore = {
       avatar_url: data.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop&q=80',
       phone: data.phone || '+91 98000 00000',
       role: 'client',
-      skillsetu_id: `SK-CL-${randomIdNumber}`,
+      skillsetu_id: `${idPrefix}-${randomIdNumber}`,
       client_type: data.client_type,
       organization_name: data.organization_name,
       organization_type: data.organization_type,
+      business_type: data.business_type,
       website: data.website,
       industry: data.industry,
+      representative_name: data.representative_name,
       representative_role: data.representative_role,
       hiring_purpose: data.hiring_purpose || ['Projects', 'Events'],
       college: data.college,
       course: data.course,
       year: data.year,
       location: data.location || 'Mumbai, MH',
-      about: data.about || 'Client hiring student talent on SkillSetu.',
+      about: data.about || `Registered as ${data.client_type} on SkillSetu.`,
       total_spent: 0,
       hired_count: 0,
       rating_given_avg: 5.0,
