@@ -92,12 +92,6 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Link href="/portfolio/builder">
-                <Button variant="outline" className="font-bold text-xs">
-                  <Sparkles className="w-3.5 h-3.5 mr-1 text-orange-600" />
-                  Portfolio Builder
-                </Button>
-              </Link>
               <Link href="/create">
                 <Button variant="default" className="font-bold text-xs shadow-xs">
                   <PlusCircle className="w-4 h-4 mr-1.5" />
@@ -106,51 +100,6 @@ export default function DashboardPage() {
               </Link>
             </div>
           </div>
-
-          {/* Portfolio Builder Banner */}
-          {(() => {
-            const portfolio = store.getPortfolioByStudentId(student.id);
-            const isPub = portfolio?.status === 'published';
-            const slug = portfolio?.username || student.full_name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            return (
-              <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2 py-0.5 rounded">
-                      Built-in Portfolio Builder
-                    </span>
-                    <Badge variant={isPub ? 'emerald' : 'secondary'} className="text-[10px] capitalize">
-                      {isPub ? 'Live & Published' : 'Draft / Not Created'}
-                    </Badge>
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900">
-                    {isPub ? 'Your Professional Portfolio is Active' : 'Build Your Personal Portfolio on SkillSetu'}
-                  </h3>
-                  <p className="text-xs text-slate-500 max-w-xl leading-relaxed">
-                    {isPub
-                      ? `Clients can discover your projects, case studies, and verified outcomes directly at /portfolio/${slug}`
-                      : "Show clients what you can do — even if you don't have a personal portfolio website yet. Add projects, case studies, outcomes, and tools."}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  {isPub && (
-                    <Link href={`/portfolio/${slug}`} target="_blank">
-                      <Button variant="outline" size="sm" className="text-xs font-bold">
-                        <ArrowRight className="w-3.5 h-3.5 mr-1" />
-                        View Live
-                      </Button>
-                    </Link>
-                  )}
-                  <Link href="/portfolio/builder">
-                    <Button variant="default" size="sm" className="font-bold text-xs shadow-xs">
-                      {isPub ? 'Edit Portfolio' : 'Create Portfolio →'}
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            );
-          })()}
 
           {/* Metric Cards Row */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
