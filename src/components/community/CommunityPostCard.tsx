@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { CommunityPost } from '@/types';
 import { Badge } from '@/components/ui/badge';

@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { GraduationCap, MapPin, CheckCircle2, ArrowRight } from 'lucide-react';
