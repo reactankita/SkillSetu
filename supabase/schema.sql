@@ -311,16 +311,33 @@ CREATE TABLE IF NOT EXISTS public.portfolio_achievements (
 );
 
 -- ==============================================================================
--- 13. AUTOMATED USER REGISTRATION TRIGGER (auth.users -> profiles)
+-- 13. PERFORMANCE INDEXES
+-- ==============================================================================
+CREATE INDEX IF NOT EXISTS idx_services_student_id ON public.services(student_id);
+CREATE INDEX IF NOT EXISTS idx_services_category ON public.services(category);
+CREATE INDEX IF NOT EXISTS idx_services_status ON public.services(status);
+CREATE INDEX IF NOT EXISTS idx_bookings_student_id ON public.bookings(student_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_client_id ON public.bookings(client_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_status ON public.bookings(status);
+CREATE INDEX IF NOT EXISTS idx_reviews_student_id ON public.reviews(student_id);
+CREATE INDEX IF NOT EXISTS idx_community_posts_client_id ON public.community_posts(client_id);
+CREATE INDEX IF NOT EXISTS idx_community_responses_post_id ON public.community_responses(post_id);
+CREATE INDEX IF NOT EXISTS idx_portfolios_student_id ON public.portfolios(student_id);
+CREATE INDEX IF NOT EXISTS idx_portfolios_username ON public.portfolios(username);
+
+-- ==============================================================================
+-- 14. AUTOMATED USER REGISTRATION TRIGGER (auth.users -> profiles)
 -- ==============================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
     user_role TEXT := COALESCE(NEW.raw_user_meta_data->>'role', 'student');
+    client_kind TEXT := COALESCE(NEW.raw_user_meta_data->>'client_type', 'individual');
     full_name TEXT := COALESCE(NEW.raw_user_meta_data->>'full_name', SPLIT_PART(NEW.email, '@', 1));
     avatar_url TEXT := COALESCE(NEW.raw_user_meta_data->>'avatar_url', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80');
     rand_id INT := FLOOR(100000 + RANDOM() * 900000);
     new_profile_id UUID;
+    id_prefix TEXT;
 BEGIN
     INSERT INTO public.profiles (auth_user_id, email, full_name, avatar_url, role)
     VALUES (NEW.id, NEW.email, full_name, avatar_url, user_role)
@@ -332,7 +349,7 @@ BEGIN
         ) VALUES (
             new_profile_id,
             'SK-ST-' || rand_id,
-            COALESCE(NEW.raw_user_meta_data->>'college', 'University Student'),
+            COALESCE(NEW.raw_user_meta_data->>'college', 'University Partner'),
             COALESCE(NEW.raw_user_meta_data->>'course', 'Undergraduate Degree'),
             COALESCE(NEW.raw_user_meta_data->>'year', '3rd Year'),
             COALESCE(NEW.raw_user_meta_data->>'location', 'Mumbai, MH'),
@@ -341,13 +358,27 @@ BEGIN
             500
         );
     ELSE
+        -- Choose correct prefix based on client category
+        IF client_kind = 'organization' THEN
+            id_prefix := 'SK-ORG-';
+        ELSIF client_kind = 'business' THEN
+            id_prefix := 'SK-BIZ-';
+        ELSIF client_kind = 'student' THEN
+            id_prefix := 'SK-ST-';
+        ELSE
+            id_prefix := 'SK-CL-';
+        END IF;
+
         INSERT INTO public.client_profiles (
-            profile_id, skillsetu_id, client_type, organization_name, location, about
+            profile_id, skillsetu_id, client_type, organization_name, organization_type, business_type, industry, location, about
         ) VALUES (
             new_profile_id,
-            'SK-CL-' || rand_id,
-            COALESCE(NEW.raw_user_meta_data->>'client_type', 'individual'),
+            id_prefix || rand_id,
+            client_kind,
             NEW.raw_user_meta_data->>'organization_name',
+            NEW.raw_user_meta_data->>'organization_type',
+            NEW.raw_user_meta_data->>'business_type',
+            NEW.raw_user_meta_data->>'industry',
             COALESCE(NEW.raw_user_meta_data->>'location', 'Mumbai, MH'),
             'Client hiring student talent on SkillSetu.'
         );
@@ -364,7 +395,7 @@ CREATE TRIGGER on_auth_user_created
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- ==============================================================================
--- 14. ROW LEVEL SECURITY (RLS) POLICIES
+-- 15. ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.student_profiles ENABLE ROW LEVEL SECURITY;
@@ -377,8 +408,13 @@ ALTER TABLE public.community_responses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.disputes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.student_verifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.client_verifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.portfolios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.portfolio_projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.portfolio_experience ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.portfolio_education ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.portfolio_achievements ENABLE ROW LEVEL SECURITY;
 
 -- Public Read Policies
 CREATE POLICY "Public profiles are readable by everyone" ON public.profiles FOR SELECT USING (true);
@@ -389,8 +425,11 @@ CREATE POLICY "Reviews are readable by everyone" ON public.reviews FOR SELECT US
 CREATE POLICY "Community posts are readable by everyone" ON public.community_posts FOR SELECT USING (true);
 CREATE POLICY "Published portfolios are readable by everyone" ON public.portfolios FOR SELECT USING (status = 'published' OR auth.role() = 'authenticated');
 CREATE POLICY "Portfolio projects are readable by everyone" ON public.portfolio_projects FOR SELECT USING (true);
+CREATE POLICY "Portfolio experience is readable by everyone" ON public.portfolio_experience FOR SELECT USING (true);
+CREATE POLICY "Portfolio education is readable by everyone" ON public.portfolio_education FOR SELECT USING (true);
+CREATE POLICY "Portfolio achievements are readable by everyone" ON public.portfolio_achievements FOR SELECT USING (true);
 
--- Authenticated User Write Policies
+-- Authenticated User Write / Management Policies
 CREATE POLICY "Users can insert their own profiles" ON public.profiles FOR INSERT WITH CHECK (true);
 CREATE POLICY "Users can update their own profiles" ON public.profiles FOR UPDATE USING (auth.uid() = auth_user_id);
 CREATE POLICY "Students can update their own student profile" ON public.student_profiles FOR ALL USING (true);
@@ -400,5 +439,13 @@ CREATE POLICY "Users can manage their bookings" ON public.bookings FOR ALL USING
 CREATE POLICY "Users can create reviews" ON public.reviews FOR INSERT WITH CHECK (true);
 CREATE POLICY "Clients can create community posts" ON public.community_posts FOR ALL USING (true);
 CREATE POLICY "Students can submit proposals" ON public.community_responses FOR ALL USING (true);
+CREATE POLICY "Users can view and manage their disputes" ON public.disputes FOR ALL USING (true);
+CREATE POLICY "Users can view and manage their notifications" ON public.notifications FOR ALL USING (true);
+CREATE POLICY "Students can manage subscriptions" ON public.subscriptions FOR ALL USING (true);
+CREATE POLICY "Students can submit verifications" ON public.student_verifications FOR ALL USING (true);
+CREATE POLICY "Clients can submit verifications" ON public.client_verifications FOR ALL USING (true);
 CREATE POLICY "Students can manage their portfolio" ON public.portfolios FOR ALL USING (true);
 CREATE POLICY "Students can manage portfolio projects" ON public.portfolio_projects FOR ALL USING (true);
+CREATE POLICY "Students can manage portfolio experience" ON public.portfolio_experience FOR ALL USING (true);
+CREATE POLICY "Students can manage portfolio education" ON public.portfolio_education FOR ALL USING (true);
+CREATE POLICY "Students can manage portfolio achievements" ON public.portfolio_achievements FOR ALL USING (true);

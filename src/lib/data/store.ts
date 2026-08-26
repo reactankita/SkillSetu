@@ -398,6 +398,8 @@ export const SkillSetuStore = {
 
   updateBookingStatus(id: string, status: BookingStatus, paymentStatus?: PaymentStatus) {
     const bookings = this.getBookings();
+    const targetBooking = bookings.find((b) => b.id === id);
+
     const updated = bookings.map((b) => {
       if (b.id === id) {
         return {
@@ -412,6 +414,34 @@ export const SkillSetuStore = {
 
     memoryState.bookings = updated;
     saveItem(STORAGE_KEYS.BOOKINGS, updated);
+
+    // If booking was completed/released, update student and client metrics
+    if (targetBooking && (status === 'CONFIRMED_BY_CLIENT' || paymentStatus === 'RELEASED')) {
+      // Update student completed bookings
+      const students = this.getStudents();
+      const updatedStudents = students.map((s) =>
+        s.id === targetBooking.student_id
+          ? { ...s, completed_bookings_count: (s.completed_bookings_count || 0) + 1 }
+          : s
+      );
+      memoryState.students = updatedStudents;
+      saveItem(STORAGE_KEYS.STUDENTS, updatedStudents);
+
+      // Update client hired count and spent
+      const clients = this.getClients();
+      const updatedClients = clients.map((c) =>
+        c.id === targetBooking.client_id
+          ? {
+              ...c,
+              hired_count: (c.hired_count || 0) + 1,
+              total_spent: (c.total_spent || 0) + (targetBooking.total_amount || 0),
+            }
+          : c
+      );
+      memoryState.clients = updatedClients;
+      saveItem(STORAGE_KEYS.CLIENTS, updatedClients);
+    }
+
     notifyListeners();
   },
 
@@ -444,6 +474,25 @@ export const SkillSetuStore = {
     const updated = [newReview, ...reviews];
     memoryState.reviews = updated;
     saveItem(STORAGE_KEYS.REVIEWS, updated);
+
+    // Recalculate student average rating and review count
+    const studentReviews = updated.filter((r) => r.student_id === booking.student_id);
+    const avgRating = studentReviews.length > 0
+      ? Number((studentReviews.reduce((sum, r) => sum + r.rating, 0) / studentReviews.length).toFixed(1))
+      : reviewData.rating;
+
+    const students = this.getStudents();
+    const updatedStudents = students.map((s) =>
+      s.id === booking.student_id
+        ? {
+            ...s,
+            rating: avgRating,
+            review_count: studentReviews.length,
+          }
+        : s
+    );
+    memoryState.students = updatedStudents;
+    saveItem(STORAGE_KEYS.STUDENTS, updatedStudents);
 
     // Notify student
     this.addNotification({
