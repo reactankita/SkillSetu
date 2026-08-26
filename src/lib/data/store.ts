@@ -91,9 +91,20 @@ export function subscribeStore(listener: Listener) {
   };
 }
 
+const DATA_VERSION = 'skillsetu_seed_v4';
+
 function loadItem<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
   try {
+    const currentVersion = localStorage.getItem('skillsetu_data_version');
+    if (currentVersion !== DATA_VERSION) {
+      // Clear stale caches so latest bookings and reviews always populate
+      if (key !== STORAGE_KEYS.CURRENT_USER_ROLE) {
+        localStorage.removeItem(key);
+      }
+      localStorage.setItem('skillsetu_data_version', DATA_VERSION);
+      return fallback;
+    }
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : fallback;
   } catch {
