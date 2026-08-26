@@ -13,7 +13,7 @@ import {
   Repeat,
   LogOut,
   PlusCircle,
-  Sparkles,
+  Briefcase,
   Shield,
 } from 'lucide-react';
 import { SkillSetuLogo } from '@/components/brand/SkillSetuLogo';
@@ -162,8 +162,8 @@ export function Navbar() {
 
               {role === 'student' && (
                 <>
-                  <DropdownMenuItem onClick={() => router.push('/portfolio/builder')} className="font-semibold text-slate-800">
-                    <Sparkles className="w-4 h-4 text-orange-600" />
+                  <DropdownMenuItem onClick={() => router.push('/portfolio/builder')}>
+                    <Briefcase className="w-4 h-4 text-slate-500" />
                     <span>Portfolio Builder</span>
                   </DropdownMenuItem>
 
