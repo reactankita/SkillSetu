@@ -174,6 +174,11 @@ export function Navbar() {
                 </>
               )}
 
+              <DropdownMenuItem onClick={() => router.push('/settings')}>
+                <Settings className="w-4 h-4 text-slate-500" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+
               <DropdownMenuItem onClick={() => router.push('/admin')}>
                 <Shield className="w-4 h-4 text-slate-500" />
                 <span>Admin Console</span>

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useSkillSetuStore } from '@/lib/data/store';
 import {
   Portfolio,
@@ -11,7 +11,6 @@ import {
   PortfolioStatus,
   PortfolioExperience,
   PortfolioEducation,
-  PortfolioCertification,
   PortfolioAchievement,
 } from '@/types';
 import { ProjectEditModal } from '@/components/portfolio/ProjectEditModal';
@@ -19,39 +18,36 @@ import { PortfolioThemeRenderer } from '@/components/portfolio/PortfolioThemeRen
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
-  Sparkles,
-  Eye,
   Save,
   Globe,
   Plus,
   Trash2,
-  Edit,
+  Edit2,
   Smartphone,
   Monitor,
   CheckCircle2,
-  Share2,
   ExternalLink,
-  Layers,
-  GraduationCap,
+  ChevronDown,
+  ChevronUp,
   Briefcase,
+  GraduationCap,
   Award,
-  HelpCircle,
-  FileCheck,
+  Layers,
+  Sparkles,
+  ArrowLeft,
+  Share2,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function PortfolioBuilderPage() {
-  const router = useRouter();
   const store = useSkillSetuStore();
   const student = store.getCurrentStudent();
   const services = store.getServices().filter((s) => s.student_id === student.id);
   const existingPortfolio = store.getPortfolioByStudentId(student.id);
 
-  // Form State
+  // Form States
   const [headline, setHeadline] = useState(
     existingPortfolio?.headline || `${student.course} | ${student.college}`
   );
@@ -76,7 +72,7 @@ export default function PortfolioBuilderPage() {
   const [education, setEducation] = useState<PortfolioEducation[]>(
     existingPortfolio?.education || [
       {
-        id: `edu-default`,
+        id: 'edu-default',
         portfolio_id: existingPortfolio?.id || 'portfolio-temp',
         degree_or_course: student.course,
         institution: student.college,
@@ -87,9 +83,6 @@ export default function PortfolioBuilderPage() {
   const [achievements, setAchievements] = useState<PortfolioAchievement[]>(
     existingPortfolio?.achievements || []
   );
-  const [certifications, setCertifications] = useState<PortfolioCertification[]>(
-    existingPortfolio?.certifications || []
-  );
   const [contactEmail, setContactEmail] = useState(
     existingPortfolio?.contact_email || student.email || ''
   );
@@ -99,31 +92,30 @@ export default function PortfolioBuilderPage() {
   const [githubLink, setGithubLink] = useState(
     existingPortfolio?.social_links?.github || ''
   );
-  const [linkedinLink, setLinkedinLink] = useState(
-    existingPortfolio?.social_links?.linkedin || ''
-  );
 
-  // Preview & Project Modal state
+  // Collapsible Accordion sections
+  const [expandedSection, setExpandedSection] = useState<string>('projects');
+
+  // Preview & Modal States
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
   const [editingProject, setEditingProject] = useState<PortfolioProject | null>(null);
   const [projectModalOpen, setProjectModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('projects');
   const [saveToast, setSaveToast] = useState('');
 
-  // Experience modal inputs
-  const [newExpRole, setNewExpRole] = useState('');
-  const [newExpOrg, setNewExpOrg] = useState('');
-  const [newExpDuration, setNewExpDuration] = useState('');
-  const [newExpDesc, setNewExpDesc] = useState('');
+  // Experience input form
+  const [expRole, setExpRole] = useState('');
+  const [expOrg, setExpOrg] = useState('');
+  const [expDuration, setExpDuration] = useState('');
+  const [expDesc, setExpDesc] = useState('');
 
-  // Achievement modal inputs
-  const [newAchTitle, setNewAchTitle] = useState('');
-  const [newAchYear, setNewAchYear] = useState('2024');
-  const [newAchDesc, setNewAchDesc] = useState('');
+  // Achievement input form
+  const [achTitle, setAchTitle] = useState('');
+  const [achYear, setAchYear] = useState('2024');
+  const [achDesc, setAchDesc] = useState('');
 
   const usernameSlug = student.full_name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-  // Assembled Live Portfolio Object
+  // Live Assembled Portfolio Object
   const livePortfolio: Portfolio = {
     id: existingPortfolio?.id || 'portfolio-temp',
     student_id: student.id,
@@ -139,13 +131,12 @@ export default function PortfolioBuilderPage() {
     projects,
     experience,
     education,
-    certifications,
+    certifications: existingPortfolio?.certifications || [],
     achievements,
     contact_email: contactEmail,
     contact_phone: contactPhone,
     social_links: {
       github: githubLink,
-      linkedin: linkedinLink,
     },
     views_count: existingPortfolio?.views_count || 0,
     published_at: existingPortfolio?.published_at,
@@ -159,13 +150,13 @@ export default function PortfolioBuilderPage() {
       status: 'draft',
     });
     setStatus('draft');
-    setSaveToast('Draft saved successfully.');
+    setSaveToast('Draft saved successfully');
     setTimeout(() => setSaveToast(''), 3000);
   };
 
   const handlePublish = () => {
     if (!headline || !aboutBio) {
-      alert('Please fill in your headline and about bio before publishing.');
+      alert('Please fill in your professional headline and bio before publishing.');
       return;
     }
 
@@ -177,17 +168,17 @@ export default function PortfolioBuilderPage() {
     setStatus('published');
 
     try {
-      confetti({ particleCount: 70, spread: 60 });
+      confetti({ particleCount: 60, spread: 55 });
     } catch {}
 
-    setSaveToast('Portfolio published to your public link!');
+    setSaveToast('Portfolio published! Live at your public link.');
     setTimeout(() => setSaveToast(''), 4000);
   };
 
   const handleUnpublish = () => {
     store.unpublishPortfolio(student.id);
     setStatus('unpublished');
-    setSaveToast('Portfolio unpublished.');
+    setSaveToast('Portfolio unpublished');
     setTimeout(() => setSaveToast(''), 3000);
   };
 
@@ -219,96 +210,106 @@ export default function PortfolioBuilderPage() {
 
   const handleAddExperience = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newExpRole || !newExpOrg) return;
+    if (!expRole || !expOrg) return;
     const newExp: PortfolioExperience = {
       id: `exp-${Date.now()}`,
       portfolio_id: existingPortfolio?.id || 'portfolio-temp',
-      role: newExpRole,
-      organization: newExpOrg,
-      duration: newExpDuration || '2024 – 2025',
-      description: newExpDesc,
+      role: expRole,
+      organization: expOrg,
+      duration: expDuration || '2024 – 2025',
+      description: expDesc,
       is_current: false,
     };
     setExperience([...experience, newExp]);
-    setNewExpRole('');
-    setNewExpOrg('');
-    setNewExpDuration('');
-    setNewExpDesc('');
+    setExpRole('');
+    setExpOrg('');
+    setExpDuration('');
+    setExpDesc('');
   };
 
   const handleAddAchievement = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newAchTitle) return;
+    if (!achTitle) return;
     const newAch: PortfolioAchievement = {
       id: `ach-${Date.now()}`,
       portfolio_id: existingPortfolio?.id || 'portfolio-temp',
-      title: newAchTitle,
-      year: newAchYear,
-      description: newAchDesc,
+      title: achTitle,
+      year: achYear,
+      description: achDesc,
     };
     setAchievements([...achievements, newAch]);
-    setNewAchTitle('');
-    setNewAchDesc('');
+    setAchTitle('');
+    setAchDesc('');
+  };
+
+  const toggleSection = (sec: string) => {
+    setExpandedSection(expandedSection === sec ? '' : sec);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Top Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
-        <div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Top Header Bar */}
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-              Portfolio Builder
-            </h1>
+            <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">Portfolio Builder</h1>
             <Badge
               variant={status === 'published' ? 'emerald' : 'secondary'}
-              className="capitalize text-xs font-mono"
+              className="text-[10px] uppercase font-bold tracking-wider"
             >
               {status}
             </Badge>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Build your personal portfolio on SkillSetu — no external website needed.
+          <p className="text-xs text-slate-500 font-mono">
+            Public Link: <span className="text-orange-600 font-bold">skillsetu.app/portfolio/{usernameSlug}</span>
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Action Controls & Theme Selector */}
+        <div className="flex items-center gap-3 flex-wrap self-stretch md:self-auto justify-between md:justify-end">
           {saveToast && (
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 animate-in zoom-in-95">
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 animate-in fade-in">
               {saveToast}
             </span>
           )}
 
-          <Button variant="outline" size="sm" onClick={handleSaveDraft} className="text-xs font-semibold">
+          {/* Compact Theme Selector */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs">
+            {(['professional', 'creative', 'minimal'] as PortfolioTheme[]).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTheme(t)}
+                className={`px-2.5 py-1 rounded-lg font-bold capitalize transition-all cursor-pointer ${
+                  theme === t
+                    ? 'bg-white text-slate-900 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          <Button variant="outline" size="sm" onClick={handleSaveDraft} className="text-xs font-bold h-9">
             <Save className="w-3.5 h-3.5 mr-1" />
             Save Draft
           </Button>
 
           {status === 'published' ? (
-            <>
+            <div className="flex items-center gap-2">
               <Link href={`/portfolio/${usernameSlug}`} target="_blank">
-                <Button variant="outline" size="sm" className="text-xs font-semibold text-slate-700">
+                <Button variant="outline" size="sm" className="text-xs font-bold h-9">
                   <ExternalLink className="w-3.5 h-3.5 mr-1 text-orange-600" />
-                  Public Link
+                  View Public
                 </Button>
               </Link>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleUnpublish}
-                className="text-xs font-semibold"
-              >
+              <Button variant="destructive" size="sm" onClick={handleUnpublish} className="text-xs font-semibold h-9">
                 Unpublish
               </Button>
-            </>
+            </div>
           ) : (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handlePublish}
-              className="font-bold text-xs shadow-xs"
-            >
+            <Button variant="default" size="sm" onClick={handlePublish} className="font-bold text-xs h-9 shadow-xs">
               <Globe className="w-3.5 h-3.5 mr-1.5" />
               Publish Portfolio
             </Button>
@@ -316,162 +317,27 @@ export default function PortfolioBuilderPage() {
         </div>
       </div>
 
-      {/* Editor & Preview Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* LEFT COLUMN: Section Editor (7 Cols) */}
-        <div className="lg:col-span-6 space-y-6">
-          {/* Theme & Design Selection */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                Portfolio Theme
-              </span>
-              <span className="text-[11px] text-slate-400">3 Restrained Layout Options</span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: 'professional', label: 'Professional', desc: 'Navy Editorial' },
-                { id: 'creative', label: 'Creative', desc: 'Visual Showcase' },
-                { id: 'minimal', label: 'Minimal', desc: 'Swiss Typography' },
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTheme(t.id as PortfolioTheme)}
-                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                    theme === t.id
-                      ? 'border-slate-900 bg-slate-900 text-white shadow-xs'
-                      : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800'
-                  }`}
-                >
-                  <span className="text-xs font-bold block">{t.label}</span>
-                  <span className={`text-[10px] ${theme === t.id ? 'text-slate-300' : 'text-slate-500'}`}>
-                    {t.desc}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Tabbed Section Editor */}
+      {/* Editor & Preview 55% / 45% Split Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* LEFT COLUMN: Section-Based Clean Editor (55% -> 7 Cols) */}
+        <div className="lg:col-span-7 space-y-3">
+          {/* SECTION 1: Basic Information */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="border-b border-slate-100 px-4 pt-3 bg-slate-50/50">
-                <TabsList className="bg-slate-100 p-1">
-                  <TabsTrigger value="projects" className="text-xs font-bold">
-                    Projects ({projects.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="bio" className="text-xs font-bold">
-                    Bio & Skills
-                  </TabsTrigger>
-                  <TabsTrigger value="experience" className="text-xs font-bold">
-                    Experience
-                  </TabsTrigger>
-                  <TabsTrigger value="education" className="text-xs font-bold">
-                    Academics
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+            <button
+              type="button"
+              onClick={() => toggleSection('basic')}
+              className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-50 transition-colors text-left cursor-pointer border-b border-slate-100"
+            >
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-600"></span>
+                1. Basic Information & Headline
+              </span>
+              {expandedSection === 'basic' ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+            </button>
 
-              {/* 1. PROJECTS TAB */}
-              <TabsContent value="projects" className="p-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">Featured Projects & Deliverables</h3>
-                    <p className="text-xs text-slate-500">Add client work, fest productions, coding apps, or creative designs</p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={() => {
-                      setEditingProject(null);
-                      setProjectModalOpen(true);
-                    }}
-                    className="font-bold text-xs h-8"
-                  >
-                    <Plus className="w-3.5 h-3.5 mr-1" />
-                    Add Project
-                  </Button>
-                </div>
-
-                {projects.length === 0 ? (
-                  <div className="p-8 border-2 border-dashed border-slate-200 rounded-2xl text-center space-y-3 bg-slate-50/40">
-                    <p className="text-xs text-slate-500">
-                      No projects added yet. Show clients what you can build or deliver.
-                    </p>
-                    <div className="text-[11px] text-slate-400 space-y-1">
-                      <div>💡 <em>Tip: Start with your best college project, fest photography, or freelance gig.</em></div>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setEditingProject(null);
-                        setProjectModalOpen(true);
-                      }}
-                      className="text-xs font-bold"
-                    >
-                      Add Your First Project
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {projects.map((proj) => (
-                      <div
-                        key={proj.id}
-                        className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all flex items-start justify-between gap-3 shadow-2xs"
-                      >
-                        <div className="space-y-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-700">
-                              {proj.category}
-                            </span>
-                            {proj.is_featured && (
-                              <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded">
-                                Featured
-                              </span>
-                            )}
-                          </div>
-                          <h4 className="text-xs font-bold text-slate-900 truncate">{proj.title}</h4>
-                          <p className="text-[11px] text-slate-500 line-clamp-1">{proj.short_description}</p>
-                          {proj.project_outcome && (
-                            <p className="text-[10px] text-emerald-700 font-medium line-clamp-1">
-                              ✓ {proj.project_outcome}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditingProject(proj);
-                              setProjectModalOpen(true);
-                            }}
-                            className="h-7 w-7 p-0"
-                          >
-                            <Edit className="w-3.5 h-3.5 text-slate-600" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteProject(proj.id)}
-                            className="h-7 w-7 p-0 text-rose-600 hover:text-rose-700"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-
-              {/* 2. BIO & SKILLS TAB */}
-              <TabsContent value="bio" className="p-5 space-y-4">
-                <div className="space-y-1.5">
+            {expandedSection === 'basic' && (
+              <div className="p-5 space-y-3.5">
+                <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-900">Professional Headline *</label>
                   <Input
                     required
@@ -482,8 +348,48 @@ export default function PortfolioBuilderPage() {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-900">About / Professional Bio *</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-900">Contact Email</label>
+                    <Input
+                      type="email"
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-900">GitHub or Behance URL</label>
+                    <Input
+                      placeholder="https://github.com/..."
+                      value={githubLink}
+                      onChange={(e) => setGithubLink(e.target.value)}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* SECTION 2: About & Skills */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('about')}
+              className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-50 transition-colors text-left cursor-pointer border-b border-slate-100"
+            >
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-teal-600"></span>
+                2. About Bio & Core Skills
+              </span>
+              {expandedSection === 'about' ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+            </button>
+
+            {expandedSection === 'about' && (
+              <div className="p-5 space-y-3.5">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-900">About Me / Bio *</label>
                   <Textarea
                     rows={4}
                     placeholder="Tell clients about your background, specializations, and what drives your work..."
@@ -493,176 +399,332 @@ export default function PortfolioBuilderPage() {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-900">Skills & Tech Stack (comma separated)</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-900">Skills & Tooling (Comma separated)</label>
                   <Input
-                    placeholder="e.g. React, Next.js, Figma, Python, Video Editing"
+                    placeholder="e.g. React, Next.js, Figma, Python, Video Editing, Studio Lighting"
                     value={skillsInput}
                     onChange={(e) => setSkillsInput(e.target.value)}
                     className="text-xs"
                   />
                 </div>
+              </div>
+            )}
+          </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-900">Contact Email</label>
-                    <Input
-                      type="email"
-                      value={contactEmail}
-                      onChange={(e) => setContactEmail(e.target.value)}
-                      className="text-xs"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-900">GitHub or Portfolio URL</label>
-                    <Input
-                      value={githubLink}
-                      placeholder="https://github.com/..."
-                      onChange={(e) => setGithubLink(e.target.value)}
-                      className="text-xs"
-                    />
-                  </div>
+          {/* SECTION 3: Projects (CORE) */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('projects')}
+              className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-50 transition-colors text-left cursor-pointer border-b border-slate-100"
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-600"></span>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  3. Portfolio Projects ({projects.length})
+                </span>
+              </div>
+              {expandedSection === 'projects' ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+            </button>
+
+            {expandedSection === 'projects' && (
+              <div className="p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-slate-500">Showcase technical & creative work, fests, coding apps, and designs</p>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => {
+                      setEditingProject(null);
+                      setProjectModalOpen(true);
+                    }}
+                    className="text-xs font-bold h-8"
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" />
+                    Add Project
+                  </Button>
                 </div>
-              </TabsContent>
 
-              {/* 3. EXPERIENCE TAB */}
-              <TabsContent value="experience" className="p-5 space-y-4">
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Add Experience</h4>
-                  <form onSubmit={handleAddExperience} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <Input
-                        placeholder="Role / Title (e.g. Frontend Intern)"
-                        value={newExpRole}
-                        onChange={(e) => setNewExpRole(e.target.value)}
-                        className="text-xs bg-white"
-                      />
-                      <Input
-                        placeholder="Organization (e.g. Razorpay / Club)"
-                        value={newExpOrg}
-                        onChange={(e) => setNewExpOrg(e.target.value)}
-                        className="text-xs bg-white"
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <Input
-                        placeholder="Duration (e.g. May 2025 – Jul 2025)"
-                        value={newExpDuration}
-                        onChange={(e) => setNewExpDuration(e.target.value)}
-                        className="text-xs bg-white"
-                      />
-                      <Input
-                        placeholder="Brief description of responsibilities"
-                        value={newExpDesc}
-                        onChange={(e) => setNewExpDesc(e.target.value)}
-                        className="text-xs bg-white"
-                      />
-                    </div>
-                    <Button type="submit" size="sm" variant="outline" className="text-xs font-bold">
-                      Add Experience Entry
+                {projects.length === 0 ? (
+                  <div className="p-6 border border-dashed border-slate-200 rounded-xl text-center space-y-2.5 bg-slate-50/40">
+                    <p className="text-xs text-slate-600 font-semibold">No projects added yet.</p>
+                    <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                      Start with a college fest production, course project, graphic set, tutoring guide, or freelance app.
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditingProject(null);
+                        setProjectModalOpen(true);
+                      }}
+                      className="text-xs font-bold"
+                    >
+                      Add First Project
                     </Button>
-                  </form>
-                </div>
-
-                <div className="space-y-2 pt-2">
-                  <h4 className="text-xs font-bold text-slate-900">Recorded Experience ({experience.length})</h4>
-                  {experience.map((exp) => (
-                    <div key={exp.id} className="p-3 rounded-lg border border-slate-200 bg-white flex items-center justify-between text-xs">
-                      <div>
-                        <strong>{exp.role}</strong> at <span className="text-orange-600 font-semibold">{exp.organization}</span>
-                        <span className="text-slate-400 block text-[11px]">{exp.duration}</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setExperience(experience.filter((x) => x.id !== exp.id))}
-                        className="text-rose-600 h-6 w-6 p-0"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-
-              {/* 4. ACADEMICS & ACHIEVEMENTS TAB */}
-              <TabsContent value="education" className="p-5 space-y-4">
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Education Details</h4>
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-                    <div><strong>Course:</strong> {student.course}</div>
-                    <div><strong>Institution:</strong> {student.college}</div>
-                    <div><strong>Current Year:</strong> {student.year}</div>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {projects.map((proj) => (
+                      <div
+                        key={proj.id}
+                        className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all flex items-center justify-between gap-3 shadow-2xs"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="relative h-12 w-12 rounded-lg bg-slate-100 overflow-hidden shrink-0">
+                            <Image
+                              src={proj.cover_image_url}
+                              alt={proj.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[9px] font-bold uppercase bg-slate-100 px-1.5 py-0.2 rounded text-slate-600">
+                                {proj.category}
+                              </span>
+                              {proj.is_featured && (
+                                <span className="text-[9px] font-bold text-orange-600 bg-orange-50 px-1.5 py-0.2 rounded">
+                                  Featured
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="text-xs font-bold text-slate-900 truncate mt-0.5">{proj.title}</h4>
+                            <p className="text-[10px] text-slate-500 truncate">{proj.short_description}</p>
+                          </div>
+                        </div>
 
-                <div className="space-y-3 pt-2 border-t border-slate-100">
-                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Add Achievement / Award</h4>
-                  <form onSubmit={handleAddAchievement} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                    <div className="grid grid-cols-3 gap-2">
-                      <Input
-                        placeholder="Title (e.g. Smart India Hackathon)"
-                        value={newAchTitle}
-                        onChange={(e) => setNewAchTitle(e.target.value)}
-                        className="col-span-2 text-xs bg-white"
-                      />
-                      <Input
-                        placeholder="Year (e.g. 2024)"
-                        value={newAchYear}
-                        onChange={(e) => setNewAchYear(e.target.value)}
-                        className="text-xs bg-white"
-                      />
-                    </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingProject(proj);
+                              setProjectModalOpen(true);
+                            }}
+                            className="h-7 w-7 p-0 text-slate-600"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteProject(proj.id)}
+                            className="h-7 w-7 p-0 text-rose-600"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* SECTION 4: Experience & Roles */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('experience')}
+              className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-50 transition-colors text-left cursor-pointer border-b border-slate-100"
+            >
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-slate-600"></span>
+                4. Experience & Roles ({experience.length})
+              </span>
+              {expandedSection === 'experience' ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+            </button>
+
+            {expandedSection === 'experience' && (
+              <div className="p-5 space-y-3.5">
+                <form onSubmit={handleAddExperience} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <Input
-                      placeholder="Description / Context"
-                      value={newAchDesc}
-                      onChange={(e) => setNewAchDesc(e.target.value)}
+                      placeholder="Role (e.g. Frontend Intern)"
+                      value={expRole}
+                      onChange={(e) => setExpRole(e.target.value)}
                       className="text-xs bg-white"
                     />
-                    <Button type="submit" size="sm" variant="outline" className="text-xs font-bold">
-                      Add Award Entry
+                    <Input
+                      placeholder="Organization (e.g. Razorpay)"
+                      value={expOrg}
+                      onChange={(e) => setExpOrg(e.target.value)}
+                      className="text-xs bg-white"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <Input
+                      placeholder="Duration (e.g. May 2025 – Jul 2025)"
+                      value={expDuration}
+                      onChange={(e) => setExpDuration(e.target.value)}
+                      className="text-xs bg-white"
+                    />
+                    <Input
+                      placeholder="Summary of responsibilities"
+                      value={expDesc}
+                      onChange={(e) => setExpDesc(e.target.value)}
+                      className="text-xs bg-white"
+                    />
+                  </div>
+                  <Button type="submit" size="sm" variant="outline" className="text-xs font-bold">
+                    Add Experience Entry
+                  </Button>
+                </form>
+
+                {experience.map((exp) => (
+                  <div key={exp.id} className="p-3 rounded-lg border border-slate-200 bg-white flex items-center justify-between text-xs">
+                    <div>
+                      <strong>{exp.role}</strong> • <span className="text-orange-600 font-semibold">{exp.organization}</span>
+                      <span className="text-slate-400 block text-[11px]">{exp.duration}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setExperience(experience.filter((x) => x.id !== exp.id))}
+                      className="text-rose-600 h-6 w-6 p-0"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
                     </Button>
-                  </form>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* SECTION 5: Education & Academics */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('education')}
+              className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-50 transition-colors text-left cursor-pointer border-b border-slate-100"
+            >
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-teal-600"></span>
+                5. Education & Academics
+              </span>
+              {expandedSection === 'education' ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+            </button>
+
+            {expandedSection === 'education' && (
+              <div className="p-5 space-y-3">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+                  <div><strong>Degree / Course:</strong> {student.course}</div>
+                  <div><strong>Institution:</strong> {student.college}</div>
+                  <div><strong>Year:</strong> {student.year}</div>
                 </div>
-              </TabsContent>
-            </Tabs>
+              </div>
+            )}
+          </div>
+
+          {/* SECTION 6: Achievements & Awards */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('achievements')}
+              className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-50 transition-colors text-left cursor-pointer border-b border-slate-100"
+            >
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                6. Achievements & Awards ({achievements.length})
+              </span>
+              {expandedSection === 'achievements' ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+            </button>
+
+            {expandedSection === 'achievements' && (
+              <div className="p-5 space-y-3.5">
+                <form onSubmit={handleAddAchievement} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+                  <div className="grid grid-cols-3 gap-2">
+                    <Input
+                      placeholder="Award Title (e.g. Smart India Hackathon)"
+                      value={achTitle}
+                      onChange={(e) => setAchTitle(e.target.value)}
+                      className="col-span-2 text-xs bg-white"
+                    />
+                    <Input
+                      placeholder="Year"
+                      value={achYear}
+                      onChange={(e) => setAchYear(e.target.value)}
+                      className="text-xs bg-white"
+                    />
+                  </div>
+                  <Input
+                    placeholder="Short description / context"
+                    value={achDesc}
+                    onChange={(e) => setAchDesc(e.target.value)}
+                    className="text-xs bg-white"
+                  />
+                  <Button type="submit" size="sm" variant="outline" className="text-xs font-bold">
+                    Add Award
+                  </Button>
+                </form>
+
+                {achievements.map((ach) => (
+                  <div key={ach.id} className="p-2.5 rounded-lg border border-slate-200 bg-white flex items-center justify-between text-xs">
+                    <div>
+                      <strong>{ach.title}</strong> ({ach.year})
+                      {ach.description && <span className="text-slate-400 block text-[11px]">{ach.description}</span>}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setAchievements(achievements.filter((a) => a.id !== ach.id))}
+                      className="text-rose-600 h-6 w-6 p-0"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Live Interactive Preview (6 Cols) */}
-        <div className="lg:col-span-6 space-y-3 sticky top-20">
-          <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 shadow-2xs">
-            <span className="flex items-center gap-1.5">
-              <Eye className="w-4 h-4 text-orange-600" />
-              Live {theme} Theme Preview
-            </span>
+        {/* RIGHT COLUMN: Live Portfolio Website Preview (45% -> 5 Cols) */}
+        <div className="lg:col-span-5 space-y-3 sticky top-20">
+          {/* Simulated Browser Frame Bar */}
+          <div className="bg-slate-900 text-white px-4 py-2.5 rounded-t-2xl flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+              </div>
+              <span className="font-mono text-[11px] text-slate-300 ml-2 truncate max-w-[180px]">
+                skillsetu.app/portfolio/{usernameSlug}
+              </span>
+            </div>
 
-            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
+            {/* Desktop / Mobile Switcher */}
+            <div className="flex items-center gap-1 bg-slate-800 p-0.5 rounded-lg">
               <button
                 type="button"
                 onClick={() => setPreviewDevice('desktop')}
-                className={`p-1.5 rounded-md transition-colors cursor-pointer ${
-                  previewDevice === 'desktop' ? 'bg-white shadow-2xs text-slate-900' : 'text-slate-500'
+                className={`p-1 rounded transition-colors cursor-pointer ${
+                  previewDevice === 'desktop' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <Monitor className="w-3.5 h-3.5" />
+                <Monitor className="w-3 h-3" />
               </button>
               <button
                 type="button"
                 onClick={() => setPreviewDevice('mobile')}
-                className={`p-1.5 rounded-md transition-colors cursor-pointer ${
-                  previewDevice === 'mobile' ? 'bg-white shadow-2xs text-slate-900' : 'text-slate-500'
+                className={`p-1 rounded transition-colors cursor-pointer ${
+                  previewDevice === 'mobile' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <Smartphone className="w-3.5 h-3.5" />
+                <Smartphone className="w-3 h-3" />
               </button>
             </div>
           </div>
 
-          {/* Preview Viewport Container */}
+          {/* Browser Window Viewport */}
           <div
-            className={`border border-slate-300 rounded-2xl overflow-hidden bg-white shadow-md max-h-[78vh] overflow-y-auto transition-all ${
-              previewDevice === 'mobile' ? 'max-w-sm mx-auto' : 'w-full'
+            className={`border border-t-0 border-slate-300 rounded-b-2xl overflow-hidden bg-white shadow-md max-h-[76vh] overflow-y-auto ${
+              previewDevice === 'mobile' ? 'max-w-xs mx-auto border-x' : 'w-full'
             }`}
           >
             <PortfolioThemeRenderer
@@ -670,11 +732,6 @@ export default function PortfolioBuilderPage() {
               student={student}
               services={services}
               isOwner={true}
-              onEditProject={(proj) => {
-                setEditingProject(proj);
-                setProjectModalOpen(true);
-              }}
-              onDeleteProject={handleDeleteProject}
               previewMode={true}
             />
           </div>
