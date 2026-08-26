@@ -325,3 +325,18 @@ export interface Portfolio {
   created_at: string;
 }
 
+export type SubscriptionPlanId = 'free' | 'pro' | 'agency';
+export type SubscriptionBillingCycle = 'monthly' | 'yearly';
+
+export interface StudentSubscription {
+  id: string;
+  student_id: string;
+  plan_id: SubscriptionPlanId;
+  billing_cycle: SubscriptionBillingCycle;
+  status: 'active' | 'cancelled' | 'expired';
+  amount_paid: number;
+  valid_until: string;
+  auto_renew: boolean;
+  created_at: string;
+}
+

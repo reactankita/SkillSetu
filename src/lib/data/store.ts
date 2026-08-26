@@ -20,6 +20,9 @@ import {
   BookingStatus,
   PaymentStatus,
   VerificationStatus,
+  StudentSubscription,
+  SubscriptionPlanId,
+  SubscriptionBillingCycle,
 } from '@/types';
 import {
   SEED_STUDENTS,
@@ -51,6 +54,7 @@ const STORAGE_KEYS = {
   DISPUTES: 'skillsetu_disputes',
   VERIFICATIONS: 'skillsetu_verifications',
   PORTFOLIOS: 'skillsetu_portfolios',
+  SUBSCRIPTIONS: 'skillsetu_subscriptions',
 };
 
 // In-memory fallback
@@ -69,6 +73,7 @@ let memoryState = {
   disputes: [...SEED_DISPUTES],
   verifications: [...SEED_VERIFICATIONS],
   portfolios: [...SEED_PORTFOLIOS],
+  subscriptions: [] as StudentSubscription[],
 };
 
 // Event emitter for reactive updates across components
@@ -902,6 +907,78 @@ export const SkillSetuStore = {
       student_id: studentId,
       projects: updatedProjects,
     });
+  },
+
+  // ----------------------------------------------------
+  // STUDENT SUBSCRIPTIONS (Freemium & Revenue Model)
+  // ----------------------------------------------------
+  getSubscriptions(): StudentSubscription[] {
+    return loadItem<StudentSubscription[]>(STORAGE_KEYS.SUBSCRIPTIONS, memoryState.subscriptions || []);
+  },
+
+  getStudentSubscription(studentId: string): StudentSubscription {
+    const all = this.getSubscriptions();
+    const found = all.find((s) => s.student_id === studentId);
+    if (found) return found;
+
+    // Default to Free Pass
+    return {
+      id: `sub-free-${studentId}`,
+      student_id: studentId,
+      plan_id: 'free',
+      billing_cycle: 'monthly',
+      status: 'active',
+      amount_paid: 0,
+      valid_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+      auto_renew: true,
+      created_at: new Date().toISOString(),
+    };
+  },
+
+  updateStudentSubscription(studentId: string, planId: SubscriptionPlanId, billingCycle: SubscriptionBillingCycle): StudentSubscription {
+    const all = this.getSubscriptions();
+    const existing = all.filter((s) => s.student_id !== studentId);
+
+    const planPrice =
+      planId === 'pro'
+        ? (billingCycle === 'monthly' ? 149 : 1188)
+        : planId === 'agency'
+        ? (billingCycle === 'monthly' ? 399 : 3588)
+        : 0;
+
+    const newSub: StudentSubscription = {
+      id: `sub-${Date.now()}`,
+      student_id: studentId,
+      plan_id: planId,
+      billing_cycle: billingCycle,
+      status: 'active',
+      amount_paid: planPrice,
+      valid_until: new Date(Date.now() + (billingCycle === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000).toISOString(),
+      auto_renew: true,
+      created_at: new Date().toISOString(),
+    };
+
+    const updated = [newSub, ...existing];
+    memoryState.subscriptions = updated;
+    saveItem(STORAGE_KEYS.SUBSCRIPTIONS, updated);
+
+    // Update student badges if pro/agency
+    const students = this.getStudents();
+    const updatedStudents = students.map((st) => {
+      if (st.id === studentId) {
+        let badges = st.badges.filter((b) => b !== 'Pro Gold' && b !== 'Campus Agency');
+        if (planId === 'pro') badges = ['Pro Gold', ...badges];
+        if (planId === 'agency') badges = ['Campus Agency', 'Pro Gold', ...badges];
+        return { ...st, badges };
+      }
+      return st;
+    });
+
+    memoryState.students = updatedStudents;
+    saveItem(STORAGE_KEYS.STUDENTS, updatedStudents);
+
+    notifyListeners();
+    return newSub;
   },
 };
 
