@@ -18,3 +18,22 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
   },
 });
+
+export async function signInWithGoogle(redirectTo: string = '/browse') {
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+
+  if (error) {
+    throw error;
+  }
+  return data;
+}

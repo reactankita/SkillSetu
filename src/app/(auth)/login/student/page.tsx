@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { SkillSetuLogo } from '@/components/brand/SkillSetuLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useSkillSetuStore } from '@/lib/data/store';
 import { GraduationCap, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 
@@ -45,6 +46,16 @@ export default function StudentLoginPage() {
 
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-4">
         <div className="bg-white py-8 px-6 sm:px-8 shadow-md rounded-2xl border border-slate-200 space-y-5">
+          <GoogleSignInButton text="Continue with Google" redirectTo="/browse" />
+
+          <div className="relative flex items-center justify-center my-1">
+            <div className="border-t border-slate-200 w-full" />
+            <span className="bg-white px-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+              or with email
+            </span>
+            <div className="border-t border-slate-200 w-full" />
+          </div>
+
           {/* Quick Demo Login Alert */}
           <div className="p-3.5 rounded-xl bg-orange-50 border border-orange-200 text-xs text-orange-900 flex items-center justify-between">
             <div className="space-y-0.5">

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { SkillSetuLogo } from '@/components/brand/SkillSetuLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { useSkillSetuStore } from '@/lib/data/store';
 import { GraduationCap, ShieldCheck } from 'lucide-react';
 
@@ -46,6 +47,16 @@ export default function StudentRegisterPage() {
 
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-4">
         <div className="bg-white py-8 px-6 sm:px-8 shadow-md rounded-2xl border border-slate-200 space-y-4">
+          <GoogleSignInButton text="Sign up with Google" redirectTo="/browse" />
+
+          <div className="relative flex items-center justify-center my-1">
+            <div className="border-t border-slate-200 w-full" />
+            <span className="bg-white px-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+              or register with email
+            </span>
+            <div className="border-t border-slate-200 w-full" />
+          </div>
+
           <form onSubmit={handleRegister} className="space-y-3.5">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-800">Full Name</label>
