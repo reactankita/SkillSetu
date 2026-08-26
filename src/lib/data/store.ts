@@ -91,7 +91,7 @@ export function subscribeStore(listener: Listener) {
   };
 }
 
-const DATA_VERSION = 'skillsetu_seed_v4';
+const DATA_VERSION = 'skillsetu_seed_v5';
 
 function loadItem<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
