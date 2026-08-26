@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  DollarSign,
+  Wallet,
   CheckCircle2,
   Star,
   Layers,
@@ -104,7 +104,8 @@ export default function DashboardPage() {
               title="Total Earnings"
               value={formatINR(studentTotalEarnings)}
               trend={{ value: '+18% vs last month', isPositive: true }}
-              icon={DollarSign}
+              icon={Wallet}
+              iconColor="text-orange-600"
             />
             <MetricCard
               title="Completed Bookings"
@@ -238,7 +239,8 @@ export default function DashboardPage() {
               title="Total Spent"
               value={formatINR(clientTotalSpent)}
               subtitle="Across all bookings"
-              icon={DollarSign}
+              icon={Wallet}
+              iconColor="text-orange-600"
             />
             <MetricCard
               title="Rating Given Avg"

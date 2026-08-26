@@ -119,15 +119,20 @@ export function Navbar() {
           {/* Notification Bell */}
           <NotificationBellMenu />
 
-          {/* Active Role Indicator Badge */}
-          <div className="hidden sm:block">
-            <Badge
-              variant={role === 'student' ? 'orange' : 'teal'}
-              className="capitalize text-xs font-semibold px-2.5 py-0.5"
-            >
-              {role === 'student' ? '🎓 Student' : '💼 Client'}
-            </Badge>
-          </div>
+          {/* Active Role Indicator & 1-Click Quick Switcher */}
+          <button
+            type="button"
+            onClick={handleRoleSwitch}
+            title={`Click to switch to ${role === 'student' ? 'Client' : 'Student'} Mode`}
+            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all border shadow-2xs hover:scale-105 cursor-pointer ${
+              role === 'student'
+                ? 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100'
+                : 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100'
+            }`}
+          >
+            <span>{role === 'student' ? '🎓 Student Mode' : '💼 Client Mode'}</span>
+            <Repeat className="w-3 h-3 opacity-60" />
+          </button>
 
           {/* User Profile Menu */}
           <DropdownMenu>
