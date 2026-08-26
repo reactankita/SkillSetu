@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { SkillSetuLogo } from '@/components/brand/SkillSetuLogo';
-import { ShieldCheck, Heart } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
 export function Footer() {
   return (

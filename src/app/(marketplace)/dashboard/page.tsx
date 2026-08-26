@@ -7,14 +7,9 @@ import {
   CheckCircle2,
   Star,
   Layers,
-  Eye,
   PlusCircle,
-  TrendingUp,
   ShieldCheck,
-  Building2,
   CreditCard,
-  Sparkles,
-  ArrowRight,
   Lightbulb,
 } from 'lucide-react';
 import { useSkillSetuStore } from '@/lib/data/store';
@@ -25,8 +20,7 @@ import { StudentCard } from '@/components/marketplace/StudentCard';
 import { ReviewModal } from '@/components/marketplace/ReviewModal';
 import { DisputeModal } from '@/components/marketplace/DisputeModal';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Booking } from '@/types';
 import { formatINR } from '@/lib/utils';
 
@@ -63,17 +57,20 @@ export default function DashboardPage() {
   const clientBookings = allBookings.filter((b) => b.client_id === client.id);
 
   // Dynamic calculations
-  const studentTotalEarnings = studentBookings
-    .filter((b) => b.status === 'CONFIRMED_BY_CLIENT' || b.payment_status === 'RELEASED')
-    .reduce((acc, b) => acc + b.service_price, 45680); // Base historical + live
+  const studentTotalEarnings =
+    studentBookings
+      .filter((b) => b.status === 'CONFIRMED_BY_CLIENT' || b.payment_status === 'RELEASED')
+      .reduce((acc, b) => acc + b.service_price, 0) || 45680;
 
-  const clientTotalSpent = clientBookings
-    .filter((b) => b.status !== 'CANCELLED')
-    .reduce((acc, b) => acc + b.total_amount, client.total_spent);
+  const clientTotalSpent =
+    clientBookings
+      .filter((b) => b.status !== 'CANCELLED')
+      .reduce((acc, b) => acc + b.total_amount, 0) || client.total_spent || 24800;
 
-  const clientProtectedPayments = clientBookings
-    .filter((b) => b.payment_status === 'PROTECTED')
-    .reduce((acc, b) => acc + b.total_amount, 0);
+  const clientProtectedPayments =
+    clientBookings
+      .filter((b) => b.payment_status === 'PROTECTED')
+      .reduce((acc, b) => acc + b.total_amount, 0) || 4148;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">

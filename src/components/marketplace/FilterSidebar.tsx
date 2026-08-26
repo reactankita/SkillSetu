@@ -1,10 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CATEGORIES } from '@/config/site';
-import { DeliveryMode } from '@/types';
-import { Filter, RotateCcw, ShieldCheck, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Filter, RotateCcw, ShieldCheck } from 'lucide-react';
 
 export interface FilterState {
   category: string;
@@ -32,7 +29,7 @@ export function FilterSidebar({
   };
 
   return (
-    <aside className={`w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs space-y-6 ${className}`}>
+    <aside className={`w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs space-y-5 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
@@ -49,46 +46,8 @@ export function FilterSidebar({
         </button>
       </div>
 
-      {/* Categories */}
-      <div className="space-y-2.5">
-        <label className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-          Category
-        </label>
-        <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
-          <button
-            type="button"
-            onClick={() => update({ category: 'All' })}
-            className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between ${
-              filters.category === 'All'
-                ? 'bg-orange-50 text-orange-700 font-bold'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <span>All Categories</span>
-            {filters.category === 'All' && <Check className="w-3.5 h-3.5 text-orange-600" />}
-          </button>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => update({ category: cat.name })}
-              className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-between ${
-                filters.category.toLowerCase() === cat.name.toLowerCase()
-                  ? 'bg-orange-50 text-orange-700 font-bold'
-                  : 'text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <span>{cat.name}</span>
-              {filters.category.toLowerCase() === cat.name.toLowerCase() && (
-                <Check className="w-3.5 h-3.5 text-orange-600" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Delivery Mode */}
-      <div className="space-y-2.5 border-t border-slate-100 pt-4">
+      <div className="space-y-2.5">
         <label className="text-xs font-bold text-slate-900 uppercase tracking-wider">
           Delivery Mode
         </label>

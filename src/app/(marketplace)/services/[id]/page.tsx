@@ -5,16 +5,11 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  ShieldCheck,
   MapPin,
   Globe,
   Calendar,
   Clock,
-  CheckCircle2,
   ArrowLeft,
-  Share2,
-  Star,
-  Users,
   Lock,
   ExternalLink,
 } from 'lucide-react';

@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   CreditCard,
   Lock,
-  Sparkles,
   Info,
   CheckCircle2,
 } from 'lucide-react';

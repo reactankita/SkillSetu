@@ -13,10 +13,6 @@ import {
   Star,
   Award,
   ArrowLeft,
-  Mail,
-  Phone,
-  Clock,
-  Sparkles,
   ExternalLink,
 } from 'lucide-react';
 import { useSkillSetuStore } from '@/lib/data/store';

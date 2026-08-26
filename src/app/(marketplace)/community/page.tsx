@@ -9,7 +9,7 @@ import { PostRequirementDialog } from '@/components/community/PostRequirementDia
 import { RespondDialog } from '@/components/community/RespondDialog';
 import { ResponsesDrawer } from '@/components/community/ResponsesDrawer';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Search, MessageSquare, ShieldCheck } from 'lucide-react';
+import { PlusCircle, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 export default function CommunityPage() {

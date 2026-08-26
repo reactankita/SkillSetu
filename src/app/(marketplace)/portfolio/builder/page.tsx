@@ -34,8 +34,6 @@ import {
   Briefcase,
   GraduationCap,
   Award,
-  Layers,
-  Sparkles,
   ArrowLeft,
   Share2,
 } from 'lucide-react';

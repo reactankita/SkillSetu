@@ -18,8 +18,6 @@ import {
   FileText,
   ImageIcon,
   X,
-  Sparkles,
-  ArrowRight,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 

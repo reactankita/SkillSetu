@@ -9,8 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { User, GraduationCap, Building2, MapPin, Mail, Phone, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function ProfilePage() {

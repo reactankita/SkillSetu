@@ -3,14 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useSkillSetuStore } from '@/lib/data/store';
-import { Booking, BookingStatus } from '@/types';
+import { Booking } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RecentActivityTable } from '@/components/dashboard/RecentActivityTable';
 import { ReviewModal } from '@/components/marketplace/ReviewModal';
 import { DisputeModal } from '@/components/marketplace/DisputeModal';
-import { Calendar, Clock, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export default function BookingsPage() {
   const store = useSkillSetuStore();

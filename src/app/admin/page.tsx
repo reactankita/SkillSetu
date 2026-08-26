@@ -2,10 +2,9 @@
 
 import React, { useState } from 'react';
 import { useSkillSetuStore } from '@/lib/data/store';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import {
   Users,
@@ -22,9 +21,8 @@ import {
   Eye,
   RotateCcw,
   CheckCircle2,
-  Lock,
 } from 'lucide-react';
-import { StudentVerification, Dispute, Service, Booking } from '@/types';
+import { StudentVerification, Dispute } from '@/types';
 import { formatINR, formatDate } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 

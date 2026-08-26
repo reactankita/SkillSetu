@@ -6,7 +6,7 @@ import { useSkillSetuStore } from '@/lib/data/store';
 import { Avatar } from '@/components/ui/avatar';
 import { StarRating } from '@/components/brand/StarRating';
 import { Card } from '@/components/ui/card';
-import { Star, ShieldCheck, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
 export default function ReviewsPage() {

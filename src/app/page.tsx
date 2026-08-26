@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   ShieldCheck,
   CreditCard,
@@ -11,7 +10,6 @@ import {
   CheckCircle2,
   ArrowRight,
   Sparkles,
-  Search,
   Building2,
   GraduationCap,
   Calendar,

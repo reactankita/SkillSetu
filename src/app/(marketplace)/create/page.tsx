@@ -10,9 +10,7 @@ import { ServiceCard } from '@/components/marketplace/ServiceCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ShieldCheck, ShieldAlert, Sparkles, Upload, ArrowRight, Eye, CheckCircle2 } from 'lucide-react';
-import { formatINR } from '@/lib/utils';
+import { ShieldCheck, ShieldAlert, Eye } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function CreateServicePage() {

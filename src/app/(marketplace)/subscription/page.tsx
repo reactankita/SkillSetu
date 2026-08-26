@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { SITE_CONFIG } from '@/config/site';
 import { useSkillSetuStore } from '@/lib/data/store';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, ShieldCheck, Zap, Sparkles, CreditCard, Award } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 

@@ -4,20 +4,8 @@ import React, { useState } from 'react';
 import { useSkillSetuStore } from '@/lib/data/store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import {
-  User,
-  Bell,
-  CreditCard,
-  Lock,
-  Shield,
-  CheckCircle2,
-  AlertCircle,
-  Building,
-  Smartphone,
-} from 'lucide-react';
 
 export default function SettingsPage() {
   const store = useSkillSetuStore();
