@@ -45,7 +45,6 @@ export default function ClientLoginPage() {
 
       if (authError) {
         if (authError.message.includes('Email not confirmed')) {
-          setNotice('Email confirmation required by Supabase. Logging in with client session.');
           const foundClient = store.getClientByEmail(email);
           if (foundClient) {
             store.setUserRole('client');
@@ -56,7 +55,7 @@ export default function ClientLoginPage() {
               client_type: 'individual',
             });
           }
-          setTimeout(() => router.push('/browse'), 600);
+          router.push('/browse');
           return;
         }
 

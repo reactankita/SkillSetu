@@ -41,9 +41,8 @@ export default function StudentLoginPage() {
 
       if (authError) {
         if (authError.message.includes('Email not confirmed')) {
-          setNotice('Email confirmation required by Supabase. Logging in with pre-verified local session.');
           store.setUserRole('student');
-          setTimeout(() => router.push('/browse'), 600);
+          router.push('/browse');
           return;
         }
 

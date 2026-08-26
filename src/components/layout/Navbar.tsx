@@ -97,6 +97,7 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={true}
                   className={`relative px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     isActive
                       ? 'bg-slate-100 text-slate-900 shadow-2xs'
@@ -230,6 +231,7 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={true}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`px-3 py-2 rounded-lg text-sm font-semibold text-center transition-colors ${
                     isActive
