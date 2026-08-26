@@ -62,10 +62,10 @@ export function BookingModal({ service, open, onOpenChange }: BookingModalProps)
     setTimeout(() => {
       try {
         store.createBooking({
-          serviceId: service.id,
-          bookingDate: date,
-          timeSlot,
-          durationHours: duration,
+          service_id: service.id,
+          booking_date: date,
+          time_slot: timeSlot,
+          duration_hours: duration,
           message,
         });
 

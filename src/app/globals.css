@@ -27,28 +27,50 @@
     --ring: 24 95% 53%;
     --radius: 0.5rem;
   }
+
+  .dark {
+    --background: 222 47% 8%; /* #0B1320 - Deep Navy surface */
+    --foreground: 210 40% 98%;
+    --card: 222 47% 12%; /* #0F1A2C */
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 12%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 24 95% 53%; /* Action Orange */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217 33% 18%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 24 95% 53%;
+  }
 }
 
 body {
   font-family: 'Manrope', system-ui, -apple-system, sans-serif;
-  background-color: #F8FAFC;
-  color: #0F172A;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar for clean dashboard UX */
+/* Custom scrollbar for clean marketplace UX */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: hsl(var(--muted));
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: hsl(var(--muted-foreground) / 0.3);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: hsl(var(--muted-foreground) / 0.5);
 }

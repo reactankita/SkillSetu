@@ -1,4 +1,4 @@
-import { StudentProfile, ClientProfile, Service, Booking, Review, CommunityPost, CommunityResponse, NotificationItem, Dispute, StudentVerification } from '@/types';
+import { StudentProfile, ClientProfile, Service, Booking, Review, CommunityPost, CommunityResponse, NotificationItem, Dispute, StudentVerification, Portfolio, PortfolioProject } from '@/types';
 
 export const SEED_STUDENTS: StudentProfile[] = [
   {
@@ -401,9 +401,10 @@ export const SEED_CLIENTS: ClientProfile[] = [
     avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop&q=80",
     phone: "+91 98200 99112",
     role: "client",
+    client_type: "organization",
     skillsetu_id: "SK-CL-104827",
     organization_name: "Tech Fest Committee",
-    organization_type: "College Festival & Events",
+    organization_type: "college",
     location: "Mumbai, MH",
     about: "Organizing committee for national-level college technical festivals requiring photography, event apps, stage decoration, and branding.",
     total_spent: 34500,
@@ -419,9 +420,10 @@ export const SEED_CLIENTS: ClientProfile[] = [
     avatar_url: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80",
     phone: "+91 98111 22334",
     role: "client",
+    client_type: "organization",
     skillsetu_id: "SK-CL-104828",
     organization_name: "Bloom Cafe & Roastery",
-    organization_type: "F&B / Local Business",
+    organization_type: "company",
     location: "Pune, MH",
     about: "Artisanal coffee house hiring students for food photography, Instagram reels creation, and weekend event music.",
     total_spent: 18200,
@@ -437,9 +439,10 @@ export const SEED_CLIENTS: ClientProfile[] = [
     avatar_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
     phone: "+91 98451 88990",
     role: "client",
+    client_type: "organization",
     skillsetu_id: "SK-CL-104829",
     organization_name: "Startup Sprint Labs",
-    organization_type: "Startup Incubator",
+    organization_type: "startup",
     location: "Bengaluru, KA",
     about: "Early-stage startup incubator hiring student developers, UI designers, and content writers for MVP sprints.",
     total_spent: 56000,
@@ -1332,3 +1335,143 @@ export const SEED_VERIFICATIONS: StudentVerification[] = [
     submitted_at: "2026-08-25T18:00:00Z",
   }
 ];
+
+export const SEED_PORTFOLIOS: Portfolio[] = [
+  {
+    id: "portfolio-1",
+    student_id: "student-1",
+    headline: "Senior Full-Stack Engineer & Next.js Specialist",
+    about: "I build responsive, high-performance web applications, developer platforms, and scalable APIs for fast-moving startups and student ventures. Winner of Smart India Hackathon 2025.",
+    skills: ["React", "Next.js", "TypeScript", "Node.js", "PostgreSQL", "Tailwind CSS", "Supabase", "REST & GraphQL"],
+    education: "B.Tech in Computer Science & Engineering, IIT Bombay (2022 - 2026) • CPI: 9.2/10",
+    experience: "Freelance Full-Stack Developer for 4+ startups; ex-Software Engineering Intern at Razorpay; Tech Lead at Web & Coding Club, IIT Bombay.",
+    achievements: [
+      "Smart India Hackathon 2025 — 1st Place National Winner",
+      "Dean's List of Academic Excellence (IIT Bombay, 2023-2025)",
+      "Published open-source React component library with 2.4k GitHub stars"
+    ],
+    certifications: [
+      "AWS Certified Cloud Practitioner",
+      "Meta Front-End Developer Professional Certificate"
+    ],
+    services_summary: "Custom Web Applications, MVP Development, API Architecture, Performance Optimization.",
+    template: "professional",
+    status: "published",
+    updated_at: "2026-08-20T10:00:00Z",
+    projects: [
+      {
+        id: "proj-101",
+        title: "CampusConnect — Decentralized Student Resource Hub",
+        category: "Technology",
+        description: "A collaborative student resource sharing platform with live collaborative notes, course past papers, and verified tutor matchmaking.",
+        role: "Lead Full-Stack Architect",
+        skills: ["Next.js", "TypeScript", "PostgreSQL", "Tailwind CSS", "WebSockets"],
+        date: "Jan 2026",
+        outcome: "Adopted by 3,400+ active university students across 4 campus departments.",
+        image_url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80",
+        project_link: "https://campusconnect-demo.dev"
+      },
+      {
+        id: "proj-102",
+        title: "FinPulse — Real-Time SaaS Analytics Dashboard",
+        category: "Technology",
+        description: "High-throughput financial metrics tracking platform processing 100k+ mock transactions per minute with sub-50ms latency.",
+        role: "Backend & UI Developer",
+        skills: ["React", "Node.js", "Redis", "Chart.js", "Docker"],
+        date: "Nov 2025",
+        outcome: "Won 1st prize at Inter-IIT Tech Meet Hackathon.",
+        image_url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80",
+        project_link: "https://finpulse-analytics.dev"
+      },
+      {
+        id: "proj-103",
+        title: "MoodVibe — AI Playlist Generator & Music Matcher",
+        category: "Technology",
+        description: "Interactive web app analyzing facial expressions and user mood to generate customized Spotify playlists.",
+        role: "Frontend Engineer",
+        skills: ["React", "Spotify Web API", "Tailwind CSS", "TensorFlow.js"],
+        date: "Aug 2025",
+        outcome: "Featured on Product Hunt with 450+ upvotes.",
+        image_url: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80"
+      }
+    ]
+  },
+  {
+    id: "portfolio-2",
+    student_id: "student-2",
+    headline: "Festival, Concert & Commercial Portrait Photographer",
+    about: "Capturing candid emotion, high-energy festival crowds, and commercial brand stories across Maharashtra. Equipped with Sony A7 IV and prime G-Master glass.",
+    skills: ["Event Photography", "Portrait Photography", "Adobe Lightroom Classic", "Photoshop", "Studio Strobe Lighting", "Color Grading"],
+    education: "B.Tech in Mechanical Engineering, COEP Technological University (2023 - 2027)",
+    experience: "Official Chief Photographer for MindSpark 2025 & Zest Sports Fest; Media Partner for 12+ live music gigs.",
+    achievements: [
+      "National Geographic India Student Showcase Finalist 2024",
+      "Best Cultural Coverage Award — COEP Annual Awards"
+    ],
+    certifications: [
+      "Sony Alpha Advanced Creative Workshop Certified"
+    ],
+    services_summary: "Live Fest Coverage, Corporate Gatherings, Modeling Headshots, Editorial Portraits.",
+    template: "creative",
+    status: "published",
+    updated_at: "2026-08-22T14:00:00Z",
+    projects: [
+      {
+        id: "proj-201",
+        title: "MindSpark 2025 — Official Festival Media Documentation",
+        category: "Photography",
+        description: "Complete photographic coverage of 3-day technical fest with 15,000+ attendees, keynote speakers, and pro-night concert.",
+        role: "Head of Photography",
+        skills: ["Sony A7 IV", "Low Light Shooting", "Lightroom", "Rapid Turnaround"],
+        date: "Feb 2025",
+        outcome: "Delivered 800+ curated and graded photos published across official college portals.",
+        image_url: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop&q=80"
+      },
+      {
+        id: "proj-202",
+        title: "Urban Rhythms — Street & Portraiture Series",
+        category: "Photography",
+        description: "Editorial portrait series capturing independent musicians and artists in historic Pune alleys.",
+        role: "Solo Photographer & Editor",
+        skills: ["Natural Light", "Color Correction", "Composition"],
+        date: "Oct 2025",
+        outcome: "Exhibited at Pune Art Guild Gallery.",
+        image_url: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80"
+      }
+    ]
+  },
+  {
+    id: "portfolio-4",
+    student_id: "student-4",
+    headline: "Product Designer & Design Systems Specialist",
+    about: "Crafting intuitive digital experiences, design systems, and mobile interfaces grounded in user psychology and clean typography. NID Ahmedabad graduate student.",
+    skills: ["Figma", "Design Systems", "Mobile UI", "User Research", "Wireframing", "Prototyping", "Design Tokens"],
+    education: "M.Des in Information Design, National Institute of Design (NID) Ahmedabad",
+    experience: "Product Design Intern at Swiggy; Freelance UX consultant for 6+ consumer apps.",
+    achievements: [
+      "Red Dot Junior Design Concept Nominee 2025",
+      "1st Prize in UXplore India National UI Challenge"
+    ],
+    certifications: [
+      "Nielsen Norman Group UX Master Certified"
+    ],
+    services_summary: "End-to-End Mobile App UI, Figma Component Libraries, Usability Audits, Web Apps.",
+    template: "minimal",
+    status: "published",
+    updated_at: "2026-08-21T09:00:00Z",
+    projects: [
+      {
+        id: "proj-401",
+        title: "MedEase — Elder Care Prescription & Vitals App",
+        category: "Design",
+        description: "Simplified healthcare management app designed specifically for senior citizens with high-contrast accessibility and voice commands.",
+        role: "Lead Product Designer",
+        skills: ["Figma", "Accessibility WCAG AAA", "User Testing", "Prototyping"],
+        date: "Dec 2025",
+        outcome: "Reduced task completion errors by 64% in usability tests across 40 elderly participants.",
+        image_url: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80"
+      }
+    ]
+  }
+];
+

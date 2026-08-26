@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { SITE_CONFIG } from '@/config/site';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
 
 export const metadata: Metadata = {
   title: {
@@ -19,9 +20,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full scroll-smooth">
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased selection:bg-orange-100 selection:text-orange-900">
-        {children}
+    <html lang="en" className="h-full scroll-smooth" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-orange-100 selection:text-orange-900">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

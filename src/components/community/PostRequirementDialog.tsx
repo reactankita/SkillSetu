@@ -18,6 +18,7 @@ interface PostRequirementDialogProps {
 
 export function PostRequirementDialog({ open, onOpenChange }: PostRequirementDialogProps) {
   const store = useSkillSetuStore();
+  const currentClient = store.getCurrentClient();
 
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Technology');
@@ -38,6 +39,10 @@ export function PostRequirementDialog({ open, onOpenChange }: PostRequirementDia
       budget: Number(budget),
       deadline,
       delivery_mode: deliveryMode,
+      client_id: currentClient.id,
+      client_name: currentClient.full_name,
+      client_org: currentClient.organization_name,
+      client_verified: currentClient.verification_status === 'verified',
       status: 'open',
     });
 
@@ -71,7 +76,7 @@ export function PostRequirementDialog({ open, onOpenChange }: PostRequirementDia
             </DialogHeader>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-800">Requirement Title</label>
+              <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Requirement Title</label>
               <Input
                 required
                 placeholder="e.g. Need Event Photographer for 2-Day College Fest"
@@ -82,11 +87,11 @@ export function PostRequirementDialog({ open, onOpenChange }: PostRequirementDia
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800">Category</label>
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Category</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="flex h-10 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat.id} value={cat.name}>
@@ -97,11 +102,11 @@ export function PostRequirementDialog({ open, onOpenChange }: PostRequirementDia
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800">Delivery Mode</label>
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Delivery Mode</label>
                 <select
                   value={deliveryMode}
                   onChange={(e) => setDeliveryMode(e.target.value as DeliveryMode)}
-                  className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="flex h-10 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="online">Online / Remote</option>
                   <option value="on_campus">On Campus / In-Person</option>
@@ -111,7 +116,7 @@ export function PostRequirementDialog({ open, onOpenChange }: PostRequirementDia
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-800">Detailed Description & Scope</label>
+              <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Detailed Description & Scope</label>
               <Textarea
                 required
                 placeholder="Describe project deliverables, expected time commitment, format requirements, and timeline..."
@@ -124,7 +129,7 @@ export function PostRequirementDialog({ open, onOpenChange }: PostRequirementDia
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800">Target Budget (₹)</label>
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Target Budget (₹)</label>
                 <Input
                   type="number"
                   required
@@ -136,7 +141,7 @@ export function PostRequirementDialog({ open, onOpenChange }: PostRequirementDia
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800">Application Deadline</label>
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Application Deadline</label>
                 <Input
                   type="date"
                   required
@@ -158,11 +163,11 @@ export function PostRequirementDialog({ open, onOpenChange }: PostRequirementDia
           </form>
         ) : (
           <div className="text-center py-6 space-y-3">
-            <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-emerald-600">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Requirement Published!</h3>
-            <p className="text-xs text-slate-600 max-w-xs mx-auto">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Requirement Published!</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xs mx-auto">
               Your requirement is live on the Community board. Verified students will submit quotes and proposals.
             </p>
             <Button type="button" variant="default" onClick={handleClose} className="mt-2">

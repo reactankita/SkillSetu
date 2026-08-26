@@ -24,6 +24,14 @@ export type VerificationStatus = 'pending' | 'under_review' | 'verified' | 'reje
 
 export type DisputeStatus = 'reported' | 'under_review' | 'resolved' | 'refunded' | 'released';
 
+export type ClientType = 'individual' | 'organization' | 'student_client';
+
+export type OrganizationType = 'startup' | 'company' | 'college' | 'ngo' | 'other';
+
+export type PortfolioTemplate = 'professional' | 'creative' | 'minimal';
+
+export type PortfolioStatus = 'draft' | 'published';
+
 export interface Profile {
   id: string;
   email: string;
@@ -53,18 +61,55 @@ export interface StudentProfile extends Profile {
   team_mode_available: boolean;
   badges: string[];
   verification_status: VerificationStatus;
+  id_card_doc_url?: string;
 }
 
 export interface ClientProfile extends Profile {
   skillsetu_id: string; // e.g. "SK-CL-104827"
+  client_type?: ClientType;
   organization_name?: string;
-  organization_type?: string;
+  organization_type?: OrganizationType;
+  role_designation?: string;
+  website?: string;
+  city?: string;
   location: string;
   about: string;
   total_spent: number;
   hired_count: number;
   rating_given_avg: number;
   verification_status: VerificationStatus;
+  verification_doc_url?: string;
+  is_student_client?: boolean;
+}
+
+export interface PortfolioProject {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  role: string;
+  skills: string[];
+  date: string;
+  outcome: string;
+  image_url?: string;
+  project_link?: string;
+}
+
+export interface Portfolio {
+  id: string;
+  student_id: string;
+  headline: string;
+  about: string;
+  skills: string[];
+  education: string;
+  experience: string;
+  achievements: string[];
+  certifications: string[];
+  services_summary?: string;
+  template: PortfolioTemplate;
+  status: PortfolioStatus;
+  projects: PortfolioProject[];
+  updated_at: string;
 }
 
 export interface Service {
@@ -205,4 +250,22 @@ export interface StudentVerification {
   submitted_at: string;
   reviewed_at?: string;
   rejection_reason?: string;
+}
+
+export interface ClientVerification {
+  id: string;
+  client_id: string;
+  client_type: ClientType;
+  full_name: string;
+  email: string;
+  phone: string;
+  city: string;
+  organization_name?: string;
+  organization_type?: OrganizationType;
+  role_designation?: string;
+  website?: string;
+  verification_doc_url?: string;
+  status: VerificationStatus;
+  submitted_at: string;
+  reviewed_at?: string;
 }
